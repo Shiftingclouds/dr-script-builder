@@ -120,6 +120,45 @@
   .empty{border:1px dashed var(--border); color:var(--muted); border-radius:16px; padding:32px; display:grid; place-items:center}
   .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:12px}
 
+  /* Lucid Dreaming Styles */
+  .lucid-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:10px 0}
+  .tab-btn{background:var(--bg-elev); border:1px solid var(--border); color:var(--ink); padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; transition:.2s ease}
+  .tab-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .tab-btn:hover{border-color:var(--accent)}
+  .tab-content{margin-top:16px}
+  .progress-card{background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:16px}
+  .progress-card h3{margin:0 0 12px; color:var(--ink)}
+  .stat-display{margin-bottom:12px}
+  .stat-number{font-size:24px; font-weight:700; color:var(--accent); display:block}
+  .stat-label{color:var(--muted); font-size:12px}
+  .mini-chart{height:60px; background:var(--bg-elev); border-radius:8px; display:flex; align-items:end; gap:2px; padding:4px}
+  .chart-bar{background:var(--accent); border-radius:2px; min-height:4px; flex:1; opacity:.7; transition:.2s ease}
+  .chart-bar:hover{opacity:1}
+  .goals-list{display:grid; gap:8px}
+  .goal-item{background:var(--bg-elev); border:1px solid var(--border); border-radius:8px; padding:12px; display:flex; justify-content:space-between; align-items:center}
+  .goal-item.completed{opacity:.7; text-decoration:line-through}
+  .goal-actions{display:flex; gap:6px}
+  .technique-card{background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:16px}
+  .technique-card h4{margin:0 0 8px; color:var(--ink)}
+  .technique-rating{display:flex; gap:4px; margin:8px 0}
+  .star{color:var(--muted); cursor:pointer; font-size:16px; transition:.2s ease}
+  .star.filled{color:#ffd700}
+  .dream-entry{background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px}
+  .dream-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px}
+  .dream-meta{display:flex; flex-direction:column; gap:4px}
+  .dream-badges{display:flex; gap:6px; flex-wrap:wrap; margin-top:6px}
+  .dream-badge{padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600}
+  .dream-badge.lucid{background:rgba(124,108,255,.2); color:var(--accent)}
+  .dream-badge.semi{background:rgba(139,92,246,.2); color:var(--accent-2)}
+  .dream-badge.normal{background:rgba(123,127,136,.2); color:var(--muted)}
+  .dream-badge.nightmare{background:rgba(239,68,68,.2); color:#ef4444}
+  .goals-summary{display:grid; gap:4px; font-size:12px}
+  .goals-summary-item{display:flex; justify-content:space-between; color:var(--muted)}
+  .emotion-btn, .rc-btn{background:var(--bg-elev); border:1px solid var(--border); color:var(--muted); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:12px; transition:.2s ease}
+  .emotion-btn.active, .rc-btn.active{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .emotion-btn.hover, .rc-btn:hover{border-color:var(--accent)}
+  .journal-tag{padding:4px 8px; border:1px solid var(--border); border-radius:12px; font-size:11px; background:#15171a}
+
   @media (max-width: 920px){ .app{grid-template-columns:74px 1fr} .brand h1, .brand small{display:none} .nav button span{display:none} }
 
   /* Visualizers */
@@ -153,6 +192,7 @@
     <div class="nav-section">SPECIAL</div>
     <div class="nav">
       <button data-view="waiting">⏳ <span>Waiting Rooms</span></button>
+      <button data-view="lucid">🌙 <span>Lucid Dreaming</span></button>
     </div>
 
     <div class="nav-section" style="margin-top:22px">SYSTEM</div>
@@ -220,7 +260,109 @@
       <p style="color:var(--muted); margin:-4px 0 14px">Create calming spaces and link them to portals.</p>
       <div id="wrGrid" class="wr-grid"></div>
     </section>
-      <!-- Settings View -->
+
+    <!-- Lucid Dreaming View -->
+    <section id="lucid-view" class="view" hidden>
+      <h2 class="title">Lucid Dreaming</h2>
+      <p style="color:var(--muted); margin:-4px 0 14px">Track your lucid dreams, set goals, and monitor your progress</p>
+      
+      <div class="lucid-tabs" style="display:flex; gap:8px; margin:16px 0; border-bottom:1px solid var(--border); padding-bottom:8px">
+        <button class="tab-btn active" data-tab="dreams">🌙 Dream Journal</button>
+        <button class="tab-btn" data-tab="goals">🎯 Goals & Tasks</button>
+        <button class="tab-btn" data-tab="techniques">⚡ Techniques</button>
+        <button class="tab-btn" data-tab="progress">📊 Progress</button>
+      </div>
+
+      <!-- Dream Journal Tab -->
+      <div id="dreams-tab" class="tab-content">
+        <div class="toolbar">
+          <button class="btn primary" id="newDream">＋ New Dream</button>
+          <button class="btn" id="exportDreams">⬇ Export Dreams</button>
+        </div>
+        <div class="lucid-toolbar">
+          <input id="dreamSearch" class="text" placeholder="Search dreams..." style="min-width:220px"/>
+          <select id="dreamSort" class="text" style="max-width:200px">
+            <option value="date_desc">Newest first</option>
+            <option value="date_asc">Oldest first</option>
+            <option value="lucidity_desc">Most lucid first</option>
+            <option value="vividness_desc">Most vivid first</option>
+          </select>
+          <select id="dreamLucidFilter" class="text" style="max-width:200px">
+            <option value="">All dreams</option>
+            <option value="lucid">Lucid only</option>
+            <option value="semi">Semi-lucid</option>
+            <option value="normal">Normal dreams</option>
+          </select>
+        </div>
+        <div id="dreamList" class="journal-list"></div>
+        <div id="dreamEmpty" class="empty" style="display:none">No dreams recorded yet</div>
+      </div>
+
+      <!-- Goals & Tasks Tab -->
+      <div id="goals-tab" class="tab-content" hidden>
+        <div class="toolbar">
+          <button class="btn primary" id="newGoal">＋ New Goal</button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:16px">
+          <div>
+            <h3 style="margin:0 0 12px">Active Goals</h3>
+            <div id="activeGoals" class="goals-list"></div>
+          </div>
+          <div>
+            <h3 style="margin:0 0 12px">Completed Goals</h3>
+            <div id="completedGoals" class="goals-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Techniques Tab -->
+      <div id="techniques-tab" class="tab-content" hidden>
+        <div class="toolbar">
+          <button class="btn primary" id="newTechnique">＋ Add Technique</button>
+        </div>
+        <div id="techniquesList" style="display:grid; gap:16px; margin-top:16px"></div>
+      </div>
+
+      <!-- Progress Tab -->
+      <div id="progress-tab" class="tab-content" hidden>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:16px">
+          <div class="progress-card">
+            <h3>Dream Recall</h3>
+            <div class="stat-display">
+              <span id="recallRate" class="stat-number">0%</span>
+              <span class="stat-label">Last 30 days</span>
+            </div>
+            <div id="recallChart" class="mini-chart"></div>
+          </div>
+          <div class="progress-card">
+            <h3>Lucidity Rate</h3>
+            <div class="stat-display">
+              <span id="lucidityRate" class="stat-number">0%</span>
+              <span class="stat-label">Last 30 days</span>
+            </div>
+            <div id="lucidityChart" class="mini-chart"></div>
+          </div>
+          <div class="progress-card">
+            <h3>Goals Achieved</h3>
+            <div class="stat-display">
+              <span id="goalsAchieved" class="stat-number">0</span>
+              <span class="stat-label">Total completed</span>
+            </div>
+            <div id="goalsProgress" class="goals-summary"></div>
+          </div>
+          <div class="progress-card">
+            <h3>Dream Frequency</h3>
+            <div class="stat-display">
+              <span id="dreamFreq" class="stat-number">0</span>
+              <span class="stat-label">Dreams per week</span>
+            </div>
+            <div id="frequencyChart" class="mini-chart"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings View -->
     <section id="settings-view" class="view" hidden>
       <h2 class="title">Settings</h2>
       <p style="color:var(--muted); margin:-4px 0 14px">Connect Dropbox to sync your data across devices.</p>
@@ -252,7 +394,7 @@
   </main>
 </div>
 
-<!-- Confirm Modal -->
+<!-- Modals -->
 <div class="modal" id="confirmModal" aria-hidden="true">
   <div class="modal-card" style="max-width:420px">
     <p id="confirmText" style="margin:6px 0 12px; color:#e7e7ea">Are you sure?</p>
@@ -260,7 +402,6 @@
   </div>
 </div>
 
-<!-- Create Portal Modal -->
 <div class="modal" id="portalModal" aria-hidden="true">
   <div class="modal-card">
     <h3 style="margin:0 0 8px">Create Portal</h3>
@@ -277,7 +418,6 @@
   </div>
 </div>
 
-<!-- Waiting Room Modal -->
 <div class="modal" id="wrModal" aria-hidden="true">
   <div class="modal-card">
     <h3 id="wrModalTitle" style="margin:0 0 8px">Edit Waiting Room</h3>
@@ -301,7 +441,6 @@
   </div>
 </div>
 
-<!-- Journal Modal -->
 <div class="modal" id="journalModal" aria-hidden="true">
   <div class="modal-card" style="width:min(960px,95vw); max-height:90vh; overflow-y:auto">
     <h3 id="jModalTitle" style="margin:0 0 10px">New Entry</h3>
@@ -321,7 +460,6 @@
   </div>
 </div>
 
-<!-- Visualizer Upload Modal -->
 <div class="modal" id="vizUploadModal" aria-hidden="true">
   <div class="modal-card" style="width:min(720px,95vw)">
     <h3 style="margin:0 0 10px">Upload Images</h3>
@@ -339,7 +477,6 @@
   </div>
 </div>
 
-<!-- Image Lightbox -->
 <div class="modal" id="lightbox" aria-hidden="true">
   <div class="modal-card" style="width:min(95vw, 1100px); background:#0b0c10; border-color:#1b1d22">
     <div style="display:flex; justify-content:space-between; align-items:center; margin:-8px -8px 8px 0">
@@ -355,7 +492,6 @@
   </div>
 </div>
 
-<!-- Playlist Modal -->
 <div class="modal" id="plModal" aria-hidden="true">
   <div class="modal-card" style="width:min(760px,95vw)">
     <h3 id="plModalTitle" style="margin:0 0 10px">New Playlist</h3>
@@ -379,6 +515,154 @@
       </div>
     </div>
     <div class="actions"><button class="btn ghost" id="plCancel">Cancel</button><button class="btn primary" id="plSave">Save Playlist</button></div>
+  </div>
+</div>
+
+<!-- Dream Entry Modal -->
+<div class="modal" id="dreamModal" aria-hidden="true">
+  <div class="modal-card" style="width:min(900px,95vw); max-height:90vh; overflow-y:auto">
+    <h3 id="dreamModalTitle" style="margin:0 0 16px">New Dream Entry</h3>
+    <div class="modal-grid" style="grid-template-columns:1fr 1fr">
+      <div>
+        <div class="field"><label class="label">Date & Time</label><input id="dreamDate" type="datetime-local" class="text"/></div>
+        <div class="field"><label class="label">Dream Title (optional)</label><input id="dreamTitle" class="text" placeholder="e.g. Flying over mountains"/></div>
+        <div class="field">
+          <label class="label">Lucidity Level</label>
+          <select id="dreamLucidity" class="text">
+            <option value="normal">Normal Dream</option>
+            <option value="semi">Semi-Lucid</option>
+            <option value="lucid">Fully Lucid</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label">Vividness (1-10)</label>
+          <input id="dreamVividness" type="range" min="1" max="10" value="5" class="text" style="width:100%"/>
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--muted)">
+            <span>Vague</span><span id="vividnessValue">5</span><span>Crystal Clear</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Emotions</label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap">
+            <button type="button" class="emotion-btn" data-emotion="joy">😊 Joy</button>
+            <button type="button" class="emotion-btn" data-emotion="fear">😨 Fear</button>
+            <button type="button" class="emotion-btn" data-emotion="wonder">🤩 Wonder</button>
+            <button type="button" class="emotion-btn" data-emotion="confusion">😵 Confusion</button>
+            <button type="button" class="emotion-btn" data-emotion="excitement">🤗 Excitement</button>
+            <button type="button" class="emotion-btn" data-emotion="calm">😌 Calm</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Dream Tags</label>
+          <input id="dreamTagsInput" class="text" placeholder="flying, lucid, nightmare, etc."/>
+          <div id="dreamTagsDisplay" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px"></div>
+        </div>
+      </div>
+      <div>
+        <div class="field">
+          <label class="label">Dream Description</label>
+          <div class="rte">
+            <div class="rtebar">
+              <button data-cmd="bold">B</button>
+              <button data-cmd="italic"><em>I</em></button>
+              <button data-cmd="underline"><u>U</u></button>
+              <button data-cmd="insertUnorderedList">• List</button>
+              <button data-cmd="insertOrderedList">1. List</button>
+            </div>
+            <div id="dreamDescription" class="area" contenteditable="true" spellcheck="false" style="min-height:200px"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Reality Checks Performed</label>
+          <div style="display:flex; gap:6px; flex-wrap:wrap">
+            <button type="button" class="rc-btn" data-rc="hands">👋 Hands</button>
+            <button type="button" class="rc-btn" data-rc="clock">🕐 Clock</button>
+            <button type="button" class="rc-btn" data-rc="text">📖 Text</button>
+            <button type="button" class="rc-btn" data-rc="mirror">🪞 Mirror</button>
+            <button type="button" class="rc-btn" data-rc="nose">👃 Nose Pinch</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Goals Attempted</label>
+          <select id="dreamGoalsSelect" class="text" multiple style="height:80px">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="dreamCancel">Cancel</button>
+      <button class="btn primary" id="dreamSave">Save Dream</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="modal" id="goalModal" aria-hidden="true">
+  <div class="modal-card">
+    <h3 id="goalModalTitle" style="margin:0 0 16px">New Lucid Dream Goal</h3>
+    <div class="field"><label class="label">Goal Title</label><input id="goalTitle" class="text" placeholder="e.g. Fly to the moon"/></div>
+    <div class="field">
+      <label class="label">Category</label>
+      <select id="goalCategory" class="text">
+        <option value="exploration">Exploration</option>
+        <option value="flying">Flying</option>
+        <option value="meeting">Meeting Someone</option>
+        <option value="transformation">Transformation</option>
+        <option value="skill">Skill Practice</option>
+        <option value="healing">Healing</option>
+        <option value="creativity">Creativity</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label class="label">Description</label><textarea id="goalDescription" class="textarea" placeholder="Detailed description of what you want to achieve..."></textarea></div>
+    <div class="field">
+      <label class="label">Difficulty</label>
+      <select id="goalDifficulty" class="text">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+        <option value="expert">Expert</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="goalCancel">Cancel</button>
+      <button class="btn primary" id="goalSave">Save Goal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Technique Modal -->
+<div class="modal" id="techniqueModal" aria-hidden="true">
+  <div class="modal-card">
+    <h3 id="techniqueModalTitle" style="margin:0 0 16px">Add Technique</h3>
+    <div class="field"><label class="label">Technique Name</label><input id="techniqueName" class="text" placeholder="e.g. WILD, MILD, Reality Checks"/></div>
+    <div class="field">
+      <label class="label">Type</label>
+      <select id="techniqueType" class="text">
+        <option value="induction">Dream Induction</option>
+        <option value="lucidity">Lucidity Trigger</option>
+        <option value="control">Dream Control</option>
+        <option value="recall">Dream Recall</option>
+        <option value="stabilization">Dream Stabilization</option>
+      </select>
+    </div>
+    <div class="field"><label class="label">Description</label><textarea id="techniqueDescription" class="textarea" placeholder="How to perform this technique..."></textarea></div>
+    <div class="field">
+      <label class="label">Your Success Rating (1-5 stars)</label>
+      <div id="techniqueRating" class="technique-rating">
+        <span class="star" data-rating="1">★</span>
+        <span class="star" data-rating="2">★</span>
+        <span class="star" data-rating="3">★</span>
+        <span class="star" data-rating="4">★</span>
+        <span class="star" data-rating="5">★</span>
+      </div>
+    </div>
+    <div class="field"><label class="label">Notes</label><textarea id="techniqueNotes" class="textarea" placeholder="Personal notes, tips, modifications..."></textarea></div>
+    <div class="actions">
+      <button class="btn ghost" id="techniqueCancel">Cancel</button>
+      <button class="btn primary" id="techniqueSave">Save Technique</button>
+    </div>
   </div>
 </div>
 
@@ -416,40 +700,94 @@
 <script>
   // ===== State =====
   const storeKey='drsb-data-v2';
-  let state = load() || { portals:[], waitingRooms:[], journal:[], playlists:[], images:[], sync:{provider:null, appKey:'', accessToken:'', path:'/Apps/DR Script Builder/data.json', auto:false, intervalMins:5, lastSync:0} };
+  let state = load() || { 
+    portals:[], 
+    waitingRooms:[], 
+    journal:[], 
+    playlists:[], 
+    images:[], 
+    dreams:[], 
+    lucidGoals:[], 
+    techniques:[], 
+    sync:{
+      provider:null, 
+      appKey:'', 
+      accessToken:'', 
+      path:'/Apps/DR Script Builder/data.json', 
+      auto:false, 
+      intervalMins:5, 
+      lastSync:0
+    } 
+  };
+  
   if(!state.playlists) state.playlists=[];
   if(!state.images) state.images=[];
+  if(!state.dreams) state.dreams=[];
+  if(!state.lucidGoals) state.lucidGoals=[];
+  if(!state.techniques) state.techniques=[];
   if(!state.sync) state.sync={provider:null, appKey:'', accessToken:'', path:'/Apps/DR Script Builder/data.json', auto:false, intervalMins:5, lastSync:0};
 
   // ===== Utils =====
   const qs = (q)=>document.querySelector(q);
-  function save(){ localStorage.setItem(storeKey, JSON.stringify(state)); }
+  function save(){ 
+    localStorage.setItem(storeKey, JSON.stringify(state)); 
+    // Auto-sync to Dropbox if connected
+    if(state.sync?.accessToken && state.sync?.auto) {
+      setTimeout(() => {
+        syncPush().catch(err => console.warn('Auto-sync failed:', err));
+      }, 100);
+    }
+  }
   function load(){ try{ return JSON.parse(localStorage.getItem(storeKey)||''); }catch{return null} }
   function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
   function toLocalInput(iso){ try{ const d=new Date(iso); const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }catch{ return ''; } }
 
   // ===== Navigation =====
-  const views={ portals:qs('#portals-view'), journal:qs('#journal-view'), playlists:qs('#playlists-view'), waiting:qs('#waiting-view'), visualizers:qs('#visualizers-view'), settings:qs('#settings-view') };
+  const views={ 
+    portals:qs('#portals-view'), 
+    journal:qs('#journal-view'), 
+    playlists:qs('#playlists-view'), 
+    waiting:qs('#waiting-view'), 
+    visualizers:qs('#visualizers-view'), 
+    settings:qs('#settings-view'),
+    lucid:qs('#lucid-view')
+  };
+  
   document.querySelectorAll('.nav button').forEach(btn=>{
     btn.addEventListener('click',()=>{
       document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      const view = btn.dataset.view; Object.keys(views).forEach(k=>{ if(views[k]) views[k].hidden = k!==view; });
+      const view = btn.dataset.view; 
+      Object.keys(views).forEach(k=>{ 
+        if(views[k]) views[k].hidden = k!==view; 
+      });
       if(view==='portals') renderPortals();
       if(view==='journal') renderJournal();
       if(view==='waiting') renderWR();
       if(view==='playlists') renderPlaylists();
       if(view==='visualizers') renderVisualizers();
+      if(view==='lucid') renderLucidDreaming();
     });
   });
 
   // ===== Confirm Modal =====
   function askConfirm(message){
-    const modal=qs('#confirmModal'); const txt=qs('#confirmText'); const ok=qs('#confirmOk'); const cancel=qs('#confirmCancel');
+    const modal=qs('#confirmModal'); 
+    const txt=qs('#confirmText'); 
+    const ok=qs('#confirmOk'); 
+    const cancel=qs('#confirmCancel');
     return new Promise((resolve)=>{
-      const cleanup=()=>{ ok.onclick=null; cancel.onclick=null; modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); };
-      txt.textContent=message||'Are you sure?'; modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
-      ok.onclick=()=>{ cleanup(); resolve(true); }; cancel.onclick=()=>{ cleanup(); resolve(false); };
+      const cleanup=()=>{ 
+        ok.onclick=null; 
+        cancel.onclick=null; 
+        modal.classList.remove('open'); 
+        modal.setAttribute('aria-hidden','true'); 
+      };
+      txt.textContent=message||'Are you sure?'; 
+      modal.classList.add('open'); 
+      modal.setAttribute('aria-hidden','false');
+      ok.onclick=()=>{ cleanup(); resolve(true); }; 
+      cancel.onclick=()=>{ cleanup(); resolve(false); };
     });
   }
 
@@ -458,23 +796,45 @@
   function renderPortals(){
     portalGrid.innerHTML='';
     // Create tile always first
-    const creator=document.createElement('div'); creator.className='portal-card';
+    const creator=document.createElement('div'); 
+    creator.className='portal-card';
     creator.innerHTML='<div class="portal-circle add" id="addPortal"></div><div class="portal-name">Create Portal</div>';
     portalGrid.appendChild(creator);
     qs('#addPortal').onclick=()=>openCreatePortal();
 
     (state.portals||[]).forEach((p,idx)=>{
-      const card=document.createElement('div'); card.className='portal-card';
-      const circle=document.createElement('div'); circle.className='portal-circle';
-      if(p.cover){ circle.style.backgroundImage=`url(${p.cover})`; } else { circle.textContent=p.name?.slice(0,10)||'Portal'; }
+      const card=document.createElement('div'); 
+      card.className='portal-card';
+      const circle=document.createElement('div'); 
+      circle.className='portal-circle';
+      if(p.cover){ 
+        circle.style.backgroundImage=`url(${p.cover})`; 
+      } else { 
+        circle.textContent=p.name?.slice(0,10)||'Portal'; 
+      }
       circle.title='Click to edit portal';
       circle.onclick=()=>openEditPortal(idx);
-      const name=document.createElement('div'); name.className='portal-name'; name.textContent=p.name||'Portal';
+      const name=document.createElement('div'); 
+      name.className='portal-name'; 
+      name.textContent=p.name||'Portal';
       name.style.cursor='pointer';
       name.onclick=()=>openEditPortal(idx);
-      const actions=document.createElement('div'); actions.className='portal-actions';
-      const edit=document.createElement('button'); edit.className='btn small'; edit.textContent='Edit'; edit.onclick=()=>openEditPortal(idx);
-      const del=document.createElement('button'); del.className='btn small'; del.textContent='Delete'; del.onclick=async()=>{ if(await askConfirm('Delete this portal?')){ state.portals.splice(idx,1); save(); renderPortals(); } };
+      const actions=document.createElement('div'); 
+      actions.className='portal-actions';
+      const edit=document.createElement('button'); 
+      edit.className='btn small'; 
+      edit.textContent='Edit'; 
+      edit.onclick=()=>openEditPortal(idx);
+      const del=document.createElement('button'); 
+      del.className='btn small'; 
+      del.textContent='Delete'; 
+      del.onclick=async()=>{ 
+        if(await askConfirm('Delete this portal?')){ 
+          state.portals.splice(idx,1); 
+          save(); 
+          renderPortals(); 
+        } 
+      };
       actions.append(edit, del);
       card.append(circle, name, actions);
       portalGrid.appendChild(card);
@@ -483,10 +843,20 @@
     qs('#portalEmpty').style.display = (state.portals||[]).length? 'none' : 'grid';
   }
 
-  // Create/Edit Portal Modal (Create only; edits use drawer)
-  const pModal=qs('#portalModal'); const pCoverPrev=qs('#pCoverPreview'); const pCoverInput=qs('#pCoverInput'); const pNameInput=qs('#pNameInput');
+  // Create Portal Modal
+  const pModal=qs('#portalModal'); 
+  const pCoverPrev=qs('#pCoverPreview'); 
+  const pCoverInput=qs('#pCoverInput'); 
+  const pNameInput=qs('#pNameInput');
   let pEditingIndex=null;
-  function resetPortalModal(){ pCoverPrev.style.backgroundImage=''; pCoverPrev.textContent='IMG'; pCoverPrev.dataset.src=''; pNameInput.value=''; }
+
+  function resetPortalModal(){ 
+    pCoverPrev.style.backgroundImage=''; 
+    pCoverPrev.textContent='IMG'; 
+    pCoverPrev.dataset.src=''; 
+    pNameInput.value=''; 
+  }
+
   qs('#pCancel').onclick=()=>{ pModal.classList.remove('open'); pEditingIndex=null; };
   qs('#pCreate').onclick=()=>{
     const name=(pNameInput.value||'').trim()||'Untitled Portal';
@@ -495,103 +865,332 @@
       const portal={ id:uid(), name, cover, created:Date.now() };
       state.portals.push(portal);
     } else {
-      const p=state.portals[pEditingIndex]; if(p){ p.name=name; p.cover=cover; }
+      const p=state.portals[pEditingIndex]; 
+      if(p){ p.name=name; p.cover=cover; }
     }
-    save(); pModal.classList.remove('open'); const btn=qs('#pCreate'); if(btn) btn.textContent='Create'; resetPortalModal(); renderPortals();
+    save(); 
+    pModal.classList.remove('open'); 
+    const btn=qs('#pCreate'); 
+    if(btn) btn.textContent='Create'; 
+    resetPortalModal(); 
+    renderPortals();
   };
-  pCoverInput.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ pCoverPrev.dataset.src=r.result; pCoverPrev.style.backgroundImage=`url(${r.result})`; pCoverPrev.textContent=''; }; r.readAsDataURL(f); };
-  function openCreatePortal(){ pEditingIndex=null; resetPortalModal(); pModal.classList.add('open'); const btn=qs('#pCreate'); if(btn) btn.textContent='Create'; pNameInput.focus(); }
-  function openEditPortal(idx){ openPortalEditor(idx); }
+
+  pCoverInput.onchange=(e)=>{ 
+    const f=e.target.files[0]; 
+    if(!f) return; 
+    const r=new FileReader(); 
+    r.onload=()=>{ 
+      pCoverPrev.dataset.src=r.result; 
+      pCoverPrev.style.backgroundImage=`url(${r.result})`; 
+      pCoverPrev.textContent=''; 
+    }; 
+    r.readAsDataURL(f); 
+  };
+
+  function openCreatePortal(){ 
+    pEditingIndex=null; 
+    resetPortalModal(); 
+    pModal.classList.add('open'); 
+    const btn=qs('#pCreate'); 
+    if(btn) btn.textContent='Create'; 
+    pNameInput.focus(); 
+  }
+
+  function openEditPortal(idx){ 
+    openPortalEditor(idx); 
+  }
 
   // ===== Waiting Rooms =====
   function renderWR(){
-    const grid=qs('#wrGrid'); grid.innerHTML='';
-    const add=document.createElement('div'); add.className='wr-card'; add.innerHTML='<div class="wr-thumb new" id="wrCreate"></div><div class="wr-label">Create Waiting Room</div>';
-    add.querySelector('#wrCreate').onclick=()=>openWREdit(); grid.appendChild(add);
+    const grid=qs('#wrGrid'); 
+    grid.innerHTML='';
+    const add=document.createElement('div'); 
+    add.className='wr-card'; 
+    add.innerHTML='<div class="wr-thumb new" id="wrCreate"></div><div class="wr-label">Create Waiting Room</div>';
+    add.querySelector('#wrCreate').onclick=()=>openWREdit(); 
+    grid.appendChild(add);
+    
     (state.waitingRooms||[]).forEach((wr)=>{
-      const card=document.createElement('div'); card.className='wr-card';
-      const thumb=document.createElement('div'); thumb.className='wr-thumb';
-      if(wr.image){ thumb.style.backgroundImage=`url(${wr.image})`; } else { thumb.textContent=wr.name||'Waiting Room'; }
-      if(wr.default){ const b=document.createElement('div'); b.className='badge'; b.textContent='Default'; thumb.appendChild(b); }
+      const card=document.createElement('div'); 
+      card.className='wr-card';
+      const thumb=document.createElement('div'); 
+      thumb.className='wr-thumb';
+      if(wr.image){ 
+        thumb.style.backgroundImage=`url(${wr.image})`; 
+      } else { 
+        thumb.textContent=wr.name||'Waiting Room'; 
+      }
+      if(wr.default){ 
+        const b=document.createElement('div'); 
+        b.className='badge'; 
+        b.textContent='Default'; 
+        thumb.appendChild(b); 
+      }
       thumb.onclick=()=>openWREdit(wr);
-      const label=document.createElement('div'); label.className='wr-label'; label.textContent=wr.name||'Waiting Room';
-      const actions=document.createElement('div'); actions.className='wr-actions';
-      const del=document.createElement('button'); del.className='btn small'; del.textContent='Delete'; del.setAttribute('data-wr-del', wr.id);
-      del.onclick=async (ev)=>{ ev.preventDefault(); ev.stopPropagation(); if(await askConfirm('Delete this waiting room?')){ const i=state.waitingRooms.findIndex(x=>x.id===wr.id); if(i>-1){ state.waitingRooms.splice(i,1); if(!state.waitingRooms.some(w=>w.default) && state.waitingRooms[0]) state.waitingRooms[0].default=true; save(); renderWR(); }} };
+      const label=document.createElement('div'); 
+      label.className='wr-label'; 
+      label.textContent=wr.name||'Waiting Room';
+      const actions=document.createElement('div'); 
+      actions.className='wr-actions';
+      const del=document.createElement('button'); 
+      del.className='btn small'; 
+      del.textContent='Delete'; 
+      del.setAttribute('data-wr-del', wr.id);
+      del.onclick=async (ev)=>{ 
+        ev.preventDefault(); 
+        ev.stopPropagation(); 
+        if(await askConfirm('Delete this waiting room?')){ 
+          const i=state.waitingRooms.findIndex(x=>x.id===wr.id); 
+          if(i>-1){ 
+            state.waitingRooms.splice(i,1); 
+            if(!state.waitingRooms.some(w=>w.default) && state.waitingRooms[0]) 
+              state.waitingRooms[0].default=true; 
+            save(); 
+            renderWR(); 
+          }
+        } 
+      };
       actions.appendChild(del);
-      card.append(thumb,label,actions); grid.appendChild(card);
+      card.append(thumb,label,actions); 
+      grid.appendChild(card);
     });
   }
 
   // WR modal
-  const wrModal=qs('#wrModal'); const wrThumbEdit=qs('#wrThumbEdit'); const wrImgInput=qs('#wrImgInput'); const wrName=qs('#wrName'); const wrDefault=qs('#wrDefault'); const wrDesc=qs('#wrDesc'); const wrAff=qs('#wrAff'); const wrChecklist=qs('#wrChecklist'); const wrChecklistItem=qs('#wrChecklistItem');
+  const wrModal=qs('#wrModal'); 
+  const wrThumbEdit=qs('#wrThumbEdit'); 
+  const wrImgInput=qs('#wrImgInput'); 
+  const wrName=qs('#wrName'); 
+  const wrDefault=qs('#wrDefault'); 
+  const wrDesc=qs('#wrDesc'); 
+  const wrAff=qs('#wrAff'); 
+  const wrChecklist=qs('#wrChecklist'); 
+  const wrChecklistItem=qs('#wrChecklistItem');
   let wrEditingId=null;
-  qs('#wrAddItem').onclick=()=>{ const t=(wrChecklistItem.value||'').trim(); if(!t) return; const li=document.createElement('li'); li.textContent=t; wrChecklist.appendChild(li); wrChecklistItem.value=''; };
-  wrImgInput.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ wrThumbEdit.style.backgroundImage=`url(${r.result})`; wrThumbEdit.textContent=''; wrThumbEdit.dataset.src=r.result; }; r.readAsDataURL(f); };
+  
+  qs('#wrAddItem').onclick=()=>{ 
+    const t=(wrChecklistItem.value||'').trim(); 
+    if(!t) return; 
+    const li=document.createElement('li'); 
+    li.textContent=t; 
+    wrChecklist.appendChild(li); 
+    wrChecklistItem.value=''; 
+  };
+  
+  wrImgInput.onchange=(e)=>{ 
+    const f=e.target.files[0]; 
+    if(!f) return; 
+    const r=new FileReader(); 
+    r.onload=()=>{ 
+      wrThumbEdit.style.backgroundImage=`url(${r.result})`; 
+      wrThumbEdit.textContent=''; 
+      wrThumbEdit.dataset.src=r.result; 
+    }; 
+    r.readAsDataURL(f); 
+  };
+  
   qs('#wrCancel').onclick=()=>{ wrModal.classList.remove('open'); };
   qs('#wrSave').onclick=()=>{
-    const data={ id: wrEditingId||uid(), name:(wrName.value||'').trim()||'Waiting Room', image: wrThumbEdit.dataset.src||'', default: wrDefault.checked, html: wrDesc.innerHTML, affirmations: (wrAff.value||'').split('\n').filter(Boolean), checklist: Array.from(wrChecklist.children).map(li=>li.textContent), timer: (qs('#wrTimer').value||'').trim() };
+    const data={ 
+      id: wrEditingId||uid(), 
+      name:(wrName.value||'').trim()||'Waiting Room', 
+      image: wrThumbEdit.dataset.src||'', 
+      default: wrDefault.checked, 
+      html: wrDesc.innerHTML, 
+      affirmations: (wrAff.value||'').split('\n').filter(Boolean), 
+      checklist: Array.from(wrChecklist.children).map(li=>li.textContent), 
+      timer: (qs('#wrTimer').value||'').trim() 
+    };
     const idx=state.waitingRooms.findIndex(w=>w.id===data.id);
-    if(idx>-1) state.waitingRooms[idx]=data; else state.waitingRooms.push(data);
-    if(data.default){ state.waitingRooms.forEach(w=>{ if(w.id!==data.id) w.default=false; }); }
-    save(); wrModal.classList.remove('open'); renderWR();
+    if(idx>-1) state.waitingRooms[idx]=data; 
+    else state.waitingRooms.push(data);
+    if(data.default){ 
+      state.waitingRooms.forEach(w=>{ 
+        if(w.id!==data.id) w.default=false; 
+      }); 
+    }
+    save(); 
+    wrModal.classList.remove('open'); 
+    renderWR();
   };
+  
   function openWREdit(wr){
-    const data = wr || { id:null, name:'', image:'', default: !state.waitingRooms.length, html:'', affirmations:[], checklist:[], timer:'' };
-    wrEditingId=data.id; wrName.value=data.name||''; wrDefault.checked=!!data.default; wrDesc.innerHTML=data.html||''; wrAff.value=(data.affirmations||[]).join('\n'); wrChecklist.innerHTML=''; (data.checklist||[]).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; wrChecklist.appendChild(li); }); qs('#wrTimer').value=data.timer||''; if(data.image){ wrThumbEdit.style.backgroundImage=`url(${data.image})`; wrThumbEdit.textContent=''; wrThumbEdit.dataset.src=data.image; } else { wrThumbEdit.style.backgroundImage=''; wrThumbEdit.textContent=data.name||'Name'; wrThumbEdit.dataset.src=''; }
+    const data = wr || { 
+      id:null, 
+      name:'', 
+      image:'', 
+      default: !state.waitingRooms.length, 
+      html:'', 
+      affirmations:[], 
+      checklist:[], 
+      timer:'' 
+    };
+    wrEditingId=data.id; 
+    wrName.value=data.name||''; 
+    wrDefault.checked=!!data.default; 
+    wrDesc.innerHTML=data.html||''; 
+    wrAff.value=(data.affirmations||[]).join('\n'); 
+    wrChecklist.innerHTML=''; 
+    (data.checklist||[]).forEach(t=>{ 
+      const li=document.createElement('li'); 
+      li.textContent=t; 
+      wrChecklist.appendChild(li); 
+    }); 
+    qs('#wrTimer').value=data.timer||''; 
+    if(data.image){ 
+      wrThumbEdit.style.backgroundImage=`url(${data.image})`; 
+      wrThumbEdit.textContent=''; 
+      wrThumbEdit.dataset.src=data.image; 
+    } else { 
+      wrThumbEdit.style.backgroundImage=''; 
+      wrThumbEdit.textContent=data.name||'Name'; 
+      wrThumbEdit.dataset.src=''; 
+    }
     wrModal.classList.add('open');
   }
 
   // ===== Playlists =====
-  const plGrid=qs('#plGrid'); const plSearch=qs('#plSearch'); const plPortalFilter=qs('#plPortalFilter');
-  const plModal=qs('#plModal'); const plCoverPrev=qs('#plCoverPrev'); const plCoverInput=qs('#plCoverInput'); const plName=qs('#plName'); const plPortalSel=qs('#plPortal'); const trkTitle=qs('#trkTitle'); const trkArtist=qs('#trkArtist'); const trkUrl=qs('#trkUrl'); const trkAdd=qs('#trkAdd'); const trkList=qs('#trkList');
-  let plEditingId=null; let plWorkingTracks=[];
+  const plGrid=qs('#plGrid'); 
+  const plSearch=qs('#plSearch'); 
+  const plPortalFilter=qs('#plPortalFilter');
+  const plModal=qs('#plModal'); 
+  const plCoverPrev=qs('#plCoverPrev'); 
+  const plCoverInput=qs('#plCoverInput'); 
+  const plName=qs('#plName'); 
+  const plPortalSel=qs('#plPortal'); 
+  const trkTitle=qs('#trkTitle'); 
+  const trkArtist=qs('#trkArtist'); 
+  const trkUrl=qs('#trkUrl'); 
+  const trkAdd=qs('#trkAdd'); 
+  const trkList=qs('#trkList');
+  let plEditingId=null; 
+  let plWorkingTracks=[];
 
   function renderPlaylists(){
     // filters
-    plPortalFilter.innerHTML=''; const optAll=document.createElement('option'); optAll.value=''; optAll.textContent='All portals'; plPortalFilter.appendChild(optAll); (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; plPortalFilter.appendChild(o); });
-
-    plGrid.innerHTML='';
-    const add=document.createElement('div'); add.className='pl-card'; add.innerHTML='<div class="pl-thumb new" id="plCreate"></div><div class="pl-label">Create Playlist</div>';
-    add.querySelector('#plCreate').onclick=()=>openPLEdit(); plGrid.appendChild(add);
-
-    let items=[...(state.playlists||[])];
-    const q=(plSearch.value||'').toLowerCase().trim(); if(q){ items=items.filter(pl=> (pl.name||'').toLowerCase().includes(q) || (pl.tracks||[]).some(t=> (t.title||'').toLowerCase().includes(q) || (t.artist||'').toLowerCase().includes(q))); }
-    const pf=plPortalFilter.value||''; if(pf!==''){ const i=parseInt(pf,10); items=items.filter(pl=> (pl.portalIndex??-1)===i); }
-
-    items.forEach(pl=>{
-      const card=document.createElement('div'); card.className='pl-card';
-      const th=document.createElement('div'); th.className='pl-thumb';
-      if(pl.cover){ th.style.backgroundImage=`url(${pl.cover})`; } else { th.textContent=pl.name||'Playlist'; }
-      th.onclick=()=>openPLEdit(pl);
-      const label=document.createElement('div'); label.className='pl-label'; label.textContent=pl.name||'Playlist';
-      const meta=document.createElement('div'); meta.style.cssText='text-align:center; color:var(--faint); font-size:12px'; meta.textContent=`${(pl.tracks||[]).length} track(s)`;
-      const actions=document.createElement('div'); actions.style.cssText='display:flex; gap:6px; justify-content:center';
-      const del=document.createElement('button'); del.className='btn small'; del.textContent='Delete'; del.onclick=async (ev)=>{ ev.preventDefault(); ev.stopPropagation(); if(await askConfirm('Delete this playlist?')){ const i=state.playlists.findIndex(x=>x.id===pl.id); if(i>-1){ state.playlists.splice(i,1); save(); renderPlaylists(); } } };
-      actions.appendChild(del);
-      card.append(th,label,meta,actions); plGrid.appendChild(card);
+    plPortalFilter.innerHTML=''; 
+    const optAll=document.createElement('option'); 
+    optAll.value=''; 
+    optAll.textContent='All portals'; 
+    plPortalFilter.appendChild(optAll); 
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      plPortalFilter.appendChild(o); 
     });
 
-    const hasAny=(state.playlists||[]).length>0; qs('#plEmpty').style.display = hasAny? 'none' : 'grid';
+    plGrid.innerHTML='';
+    const add=document.createElement('div'); 
+    add.className='pl-card'; 
+    add.innerHTML='<div class="pl-thumb new" id="plCreate"></div><div class="pl-label">Create Playlist</div>';
+    add.querySelector('#plCreate').onclick=()=>openPLEdit(); 
+    plGrid.appendChild(add);
+
+    let items=[...(state.playlists||[])];
+    const q=(plSearch.value||'').toLowerCase().trim(); 
+    if(q){ 
+      items=items.filter(pl=> 
+        (pl.name||'').toLowerCase().includes(q) || 
+        (pl.tracks||[]).some(t=> 
+          (t.title||'').toLowerCase().includes(q) || 
+          (t.artist||'').toLowerCase().includes(q)
+        )
+      ); 
+    }
+    const pf=plPortalFilter.value||''; 
+    if(pf!==''){ 
+      const i=parseInt(pf,10); 
+      items=items.filter(pl=> (pl.portalIndex??-1)===i); 
+    }
+
+    items.forEach(pl=>{
+      const card=document.createElement('div'); 
+      card.className='pl-card';
+      const th=document.createElement('div'); 
+      th.className='pl-thumb';
+      if(pl.cover){ 
+        th.style.backgroundImage=`url(${pl.cover})`; 
+      } else { 
+        th.textContent=pl.name||'Playlist'; 
+      }
+      th.onclick=()=>openPLEdit(pl);
+      const label=document.createElement('div'); 
+      label.className='pl-label'; 
+      label.textContent=pl.name||'Playlist';
+      const meta=document.createElement('div'); 
+      meta.style.cssText='text-align:center; color:var(--faint); font-size:12px'; 
+      meta.textContent=`${(pl.tracks||[]).length} track(s)`;
+      const actions=document.createElement('div'); 
+      actions.style.cssText='display:flex; gap:6px; justify-content:center';
+      const del=document.createElement('button'); 
+      del.className='btn small'; 
+      del.textContent='Delete'; 
+      del.onclick=async (ev)=>{ 
+        ev.preventDefault(); 
+        ev.stopPropagation(); 
+        if(await askConfirm('Delete this playlist?')){ 
+          const i=state.playlists.findIndex(x=>x.id===pl.id); 
+          if(i>-1){ 
+            state.playlists.splice(i,1); 
+            save(); 
+            renderPlaylists(); 
+          } 
+        } 
+      };
+      actions.appendChild(del);
+      card.append(th,label,meta,actions); 
+      plGrid.appendChild(card);
+    });
+
+    const hasAny=(state.playlists||[]).length>0; 
+    qs('#plEmpty').style.display = hasAny? 'none' : 'grid';
   }
 
-  function resetPLModal(){ plCoverPrev.style.backgroundImage=''; plCoverPrev.textContent='Cover'; plCoverPrev.dataset.src=''; plName.value=''; trkTitle.value=''; trkArtist.value=''; trkUrl.value=''; trkList.innerHTML=''; plPortalSel.innerHTML=''; plWorkingTracks=[]; }
+  function resetPLModal(){ 
+    plCoverPrev.style.backgroundImage=''; 
+    plCoverPrev.textContent='Cover'; 
+    plCoverPrev.dataset.src=''; 
+    plName.value=''; 
+    trkTitle.value=''; 
+    trkArtist.value=''; 
+    trkUrl.value=''; 
+    trkList.innerHTML=''; 
+    plPortalSel.innerHTML=''; 
+    plWorkingTracks=[]; 
+  }
 
   function openPLEdit(pl){
-    plEditingId = pl?.id || null; resetPLModal();
+    plEditingId = pl?.id || null; 
+    resetPLModal();
     // portals dropdown
-    const none=document.createElement('option'); none.value='-1'; none.textContent='No portal link'; plPortalSel.appendChild(none);
-    (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; plPortalSel.appendChild(o); });
+    const none=document.createElement('option'); 
+    none.value='-1'; 
+    none.textContent='No portal link'; 
+    plPortalSel.appendChild(none);
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      plPortalSel.appendChild(o); 
+    });
 
     if(pl){
-      plName.value=pl.name||''; plPortalSel.value=String(pl.portalIndex ?? -1);
-      if(pl.cover){ plCoverPrev.dataset.src=pl.cover; plCoverPrev.style.backgroundImage=`url(${pl.cover})`; plCoverPrev.textContent=''; }
+      plName.value=pl.name||''; 
+      plPortalSel.value=String(pl.portalIndex ?? -1);
+      if(pl.cover){ 
+        plCoverPrev.dataset.src=pl.cover; 
+        plCoverPrev.style.backgroundImage=`url(${pl.cover})`; 
+        plCoverPrev.textContent=''; 
+      }
       plWorkingTracks=[...(pl.tracks||[])];
       renderTrackList();
       qs('#plModalTitle').textContent='Edit Playlist';
     } else {
       qs('#plModalTitle').textContent='New Playlist';
-      plWorkingTracks=[]; renderTrackList();
+      plWorkingTracks=[]; 
+      renderTrackList();
       plPortalSel.value='-1';
     }
 
@@ -600,24 +1199,81 @@
 
   function renderTrackList(){
     trkList.innerHTML='';
-    if(!plWorkingTracks.length){ const empty=document.createElement('div'); empty.style.cssText='color:var(--muted); text-align:center; padding:8px'; empty.textContent='No tracks yet'; trkList.appendChild(empty); return; }
+    if(!plWorkingTracks.length){ 
+      const empty=document.createElement('div'); 
+      empty.style.cssText='color:var(--muted); text-align:center; padding:8px'; 
+      empty.textContent='No tracks yet'; 
+      trkList.appendChild(empty); 
+      return; 
+    }
     plWorkingTracks.forEach((t,idx)=>{
-      const row=document.createElement('div'); row.className='track';
+      const row=document.createElement('div'); 
+      row.className='track';
       row.innerHTML=`<div><strong>${(t.title||'Untitled').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</strong><div style="color:var(--faint); font-size:12px">${(t.artist||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div><div style="margin-top:4px; font-size:12px"><a href="${t.url||'#'}" target="_blank" rel="noopener">${(t.url||'').replace(/&/g,'&amp;')}</a></div></div>`;
-      const up=document.createElement('button'); up.className='btn small'; up.textContent='↑'; up.title='Move up'; up.onclick=()=>{ if(idx>0){ const tmp=plWorkingTracks[idx-1]; plWorkingTracks[idx-1]=plWorkingTracks[idx]; plWorkingTracks[idx]=tmp; renderTrackList(); } };
-      const del=document.createElement('button'); del.className='btn small'; del.textContent='Delete'; del.onclick=()=>{ plWorkingTracks.splice(idx,1); renderTrackList(); };
-      row.appendChild(up); row.appendChild(del); trkList.appendChild(row);
+      const up=document.createElement('button'); 
+      up.className='btn small'; 
+      up.textContent='↑'; 
+      up.title='Move up'; 
+      up.onclick=()=>{ 
+        if(idx>0){ 
+          const tmp=plWorkingTracks[idx-1]; 
+          plWorkingTracks[idx-1]=plWorkingTracks[idx]; 
+          plWorkingTracks[idx]=tmp; 
+          renderTrackList(); 
+        } 
+      };
+      const del=document.createElement('button'); 
+      del.className='btn small'; 
+      del.textContent='Delete'; 
+      del.onclick=()=>{ 
+        plWorkingTracks.splice(idx,1); 
+        renderTrackList(); 
+      };
+      row.appendChild(up); 
+      row.appendChild(del); 
+      trkList.appendChild(row);
     });
   }
 
-  trkAdd.onclick=()=>{ const title=(trkTitle.value||'').trim(); const artist=(trkArtist.value||'').trim(); const url=(trkUrl.value||'').trim(); if(!title && !url){ return; } plWorkingTracks.push({ id:uid(), title, artist, url }); trkTitle.value=''; trkArtist.value=''; trkUrl.value=''; renderTrackList(); };
-  plCoverInput.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ plCoverPrev.dataset.src=r.result; plCoverPrev.style.backgroundImage=`url(${r.result})`; plCoverPrev.textContent=''; }; r.readAsDataURL(f); };
+  trkAdd.onclick=()=>{ 
+    const title=(trkTitle.value||'').trim(); 
+    const artist=(trkArtist.value||'').trim(); 
+    const url=(trkUrl.value||'').trim(); 
+    if(!title && !url){ return; } 
+    plWorkingTracks.push({ id:uid(), title, artist, url }); 
+    trkTitle.value=''; 
+    trkArtist.value=''; 
+    trkUrl.value=''; 
+    renderTrackList(); 
+  };
+  
+  plCoverInput.onchange=(e)=>{ 
+    const f=e.target.files[0]; 
+    if(!f) return; 
+    const r=new FileReader(); 
+    r.onload=()=>{ 
+      plCoverPrev.dataset.src=r.result; 
+      plCoverPrev.style.backgroundImage=`url(${r.result})`; 
+      plCoverPrev.textContent=''; 
+    }; 
+    r.readAsDataURL(f); 
+  };
+  
   qs('#plCancel').onclick=()=>{ plModal.classList.remove('open'); };
   qs('#plSave').onclick=()=>{
-    const data={ id: plEditingId||uid(), name:(plName.value||'').trim()||'Playlist', cover: plCoverPrev.dataset.src||'', portalIndex: parseInt(plPortalSel.value||'-1',10), tracks:[...plWorkingTracks] };
+    const data={ 
+      id: plEditingId||uid(), 
+      name:(plName.value||'').trim()||'Playlist', 
+      cover: plCoverPrev.dataset.src||'', 
+      portalIndex: parseInt(plPortalSel.value||'-1',10), 
+      tracks:[...plWorkingTracks] 
+    };
     const idx=(state.playlists||[]).findIndex(x=>x.id===data.id);
-    if(idx>-1) state.playlists[idx]=data; else state.playlists.push(data);
-    save(); plModal.classList.remove('open'); renderPlaylists();
+    if(idx>-1) state.playlists[idx]=data; 
+    else state.playlists.push(data);
+    save(); 
+    plModal.classList.remove('open'); 
+    renderPlaylists();
   };
 
   plSearch?.addEventListener('input', ()=> renderPlaylists());
@@ -629,7 +1285,7 @@
     if(btn){ 
       const area = btn.closest('.rte')?.querySelector('.area');
       if(area) {
-        area.focus(); // Ensure the editor area has focus
+        area.focus();
         document.execCommand(btn.getAttribute('data-cmd'), false, null); 
       }
     }
@@ -647,7 +1303,6 @@
         const area = rte?.querySelector('.area');
         if(area) {
           area.focus();
-          // Create image element
           const img = document.createElement('img');
           img.src = r.result;
           img.alt = f.name || 'Uploaded image';
@@ -657,7 +1312,6 @@
           img.style.display = 'block';
           img.style.margin = '8px 0';
           
-          // Insert the image at cursor position or append to end
           const selection = window.getSelection();
           if(selection && selection.rangeCount > 0 && area.contains(selection.anchorNode)) {
             const range = selection.getRangeAt(0);
@@ -668,7 +1322,6 @@
             area.appendChild(img);
           }
           
-          // Clear the file input
           up.value = ''; 
         }
       }; 
@@ -677,24 +1330,104 @@
   });
 
   // ===== Journal =====
-  const jModal=qs('#journalModal'); const jTitle=qs('#jTitle'); const jDate=qs('#jDate'); const jPortalSel=qs('#jPortal'); const jBody=qs('#jBody'); const jTagsInput=qs('#jTagsInput'); const jTags=qs('#jTags'); const jSearch=qs('#jSearch'); const jSort=qs('#jSort'); const jPortalFilter2=qs('#jPortalFilter'); const jTagBar=qs('#jTagBar');
-  let currentEntryIndex=null; let activeTagFilters=new Set();
+  const jModal=qs('#journalModal'); 
+  const jTitle=qs('#jTitle'); 
+  const jDate=qs('#jDate'); 
+  const jPortalSel=qs('#jPortal'); 
+  const jBody=qs('#jBody'); 
+  const jTagsInput=qs('#jTagsInput'); 
+  const jTags=qs('#jTags'); 
+  const jSearch=qs('#jSearch'); 
+  const jSort=qs('#jSort'); 
+  const jPortalFilter2=qs('#jPortalFilter'); 
+  const jTagBar=qs('#jTagBar');
+  let currentEntryIndex=null; 
+  let activeTagFilters=new Set();
 
   qs('#newEntry').onclick=()=> openJournalEditor();
   qs('#jCancel').onclick=()=>{ jModal.classList.remove('open'); };
   qs('#jSave').onclick=()=>{
     const tags = Array.from(jTags.querySelectorAll('.tag')).map(t=>t.dataset.tag);
-    const entry={ id: currentEntryIndex==null? uid() : state.journal[currentEntryIndex].id, title: (jTitle.value||'').trim(), date: new Date(jDate.value).toISOString(), portalIndex: parseInt(jPortalSel.value||'-1',10), html: jBody.innerHTML, text: jBody.textContent||'', tags, updated:Date.now() };
-    if(currentEntryIndex==null){ state.journal.unshift(entry); } else { state.journal[currentEntryIndex]=entry; }
-    save(); jModal.classList.remove('open'); renderJournal();
+    const entry={ 
+      id: currentEntryIndex==null? uid() : state.journal[currentEntryIndex].id, 
+      title: (jTitle.value||'').trim(), 
+      date: new Date(jDate.value).toISOString(), 
+      portalIndex: parseInt(jPortalSel.value||'-1',10), 
+      html: jBody.innerHTML, 
+      text: jBody.textContent||'', 
+      tags, 
+      updated:Date.now() 
+    };
+    if(currentEntryIndex==null){ 
+      state.journal.unshift(entry); 
+    } else { 
+      state.journal[currentEntryIndex]=entry; 
+    }
+    save(); 
+    jModal.classList.remove('open'); 
+    renderJournal();
   };
-  jTagsInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=jTagsInput.value.trim(); if(v){ v.split(',').map(s=>s.trim()).filter(Boolean).forEach(addTagChip); jTagsInput.value=''; } } });
-  function addTagChip(tag){ const t=String(tag).trim(); if(!t) return; const chip=document.createElement('span'); chip.className='tag'; chip.textContent=t; chip.dataset.tag=t; const x=document.createElement('button'); x.textContent='✕'; x.className='btn small'; x.style.marginLeft='6px'; x.onclick=(ev)=>{ ev.preventDefault(); chip.remove(); }; chip.appendChild(x); jTags.appendChild(chip); }
+  
+  jTagsInput.addEventListener('keydown',(e)=>{ 
+    if(e.key==='Enter'){ 
+      e.preventDefault(); 
+      const v=jTagsInput.value.trim(); 
+      if(v){ 
+        v.split(',').map(s=>s.trim()).filter(Boolean).forEach(addTagChip); 
+        jTagsInput.value=''; 
+      } 
+    } 
+  });
+  
+  function addTagChip(tag){ 
+    const t=String(tag).trim(); 
+    if(!t) return; 
+    const chip=document.createElement('span'); 
+    chip.className='tag'; 
+    chip.textContent=t; 
+    chip.dataset.tag=t; 
+    const x=document.createElement('button'); 
+    x.textContent='✕'; 
+    x.className='btn small'; 
+    x.style.marginLeft='6px'; 
+    x.onclick=(ev)=>{ 
+      ev.preventDefault(); 
+      chip.remove(); 
+    }; 
+    chip.appendChild(x); 
+    jTags.appendChild(chip); 
+  }
 
   document.addEventListener('click',(ev)=>{
-    const edit = ev.target.closest('[data-j-edit]'); if(edit){ const id=edit.getAttribute('data-j-edit'); const idx=state.journal.findIndex(e=>e.id===id); if(idx>-1) openJournalEditor(state.journal[idx], idx); return; }
-    const del = ev.target.closest('[data-j-del]'); if(del){ ev.preventDefault(); const id=del.getAttribute('data-j-del'); const idx=state.journal.findIndex(e=>e.id===id); if(idx===-1) return; askConfirm('Delete this entry?').then(ok=>{ if(!ok) return; state.journal.splice(idx,1); save(); renderJournal(); }); return; }
-    const tg = ev.target.closest('.entry .tag'); if(tg && tg.dataset.tag){ if(activeTagFilters.has(tg.dataset.tag)) activeTagFilters.delete(tg.dataset.tag); else activeTagFilters.add(tg.dataset.tag); renderJournal(); }
+    const edit = ev.target.closest('[data-j-edit]'); 
+    if(edit){ 
+      const id=edit.getAttribute('data-j-edit'); 
+      const idx=state.journal.findIndex(e=>e.id===id); 
+      if(idx>-1) openJournalEditor(state.journal[idx], idx); 
+      return; 
+    }
+    const del = ev.target.closest('[data-j-del]'); 
+    if(del){ 
+      ev.preventDefault(); 
+      const id=del.getAttribute('data-j-del'); 
+      const idx=state.journal.findIndex(e=>e.id===id); 
+      if(idx===-1) return; 
+      askConfirm('Delete this entry?').then(ok=>{ 
+        if(!ok) return; 
+        state.journal.splice(idx,1); 
+        save(); 
+        renderJournal(); 
+      }); 
+      return; 
+    }
+    const tg = ev.target.closest('.entry .tag'); 
+    if(tg && tg.dataset.tag){ 
+      if(activeTagFilters.has(tg.dataset.tag)) 
+        activeTagFilters.delete(tg.dataset.tag); 
+      else 
+        activeTagFilters.add(tg.dataset.tag); 
+      renderJournal(); 
+    }
   });
 
   jSearch.addEventListener('input', ()=> renderJournal());
@@ -702,36 +1435,109 @@
   jPortalFilter2.addEventListener('change', ()=> renderJournal());
 
   function openJournalEditor(entry=null, idx=null){
-    currentEntryIndex=idx; jModal.classList.add('open');
+    currentEntryIndex=idx; 
+    jModal.classList.add('open');
     // populate portals
-    jPortalSel.innerHTML=''; const opt=document.createElement('option'); opt.value='-1'; opt.textContent='No portal link'; jPortalSel.appendChild(opt); (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; jPortalSel.appendChild(o); });
-    jTitle.value = entry?.title||''; jDate.value = entry?.date ? toLocalInput(entry.date) : toLocalInput(new Date().toISOString()); jPortalSel.value = String(entry?.portalIndex ?? -1); jBody.innerHTML = entry?.html || (entry?.text? entry.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '');
-    jTags.innerHTML=''; (entry?.tags||[]).forEach(addTagChip); jTagsInput.value='';
+    jPortalSel.innerHTML=''; 
+    const opt=document.createElement('option'); 
+    opt.value='-1'; 
+    opt.textContent='No portal link'; 
+    jPortalSel.appendChild(opt); 
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      jPortalSel.appendChild(o); 
+    });
+    jTitle.value = entry?.title||''; 
+    jDate.value = entry?.date ? toLocalInput(entry.date) : toLocalInput(new Date().toISOString()); 
+    jPortalSel.value = String(entry?.portalIndex ?? -1); 
+    jBody.innerHTML = entry?.html || (entry?.text? entry.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '');
+    jTags.innerHTML=''; 
+    (entry?.tags||[]).forEach(addTagChip); 
+    jTagsInput.value='';
   }
 
   function renderJournal(){
     // Filters UI
-    jPortalFilter2.innerHTML=''; const all=document.createElement('option'); all.value=''; all.textContent='All portals'; jPortalFilter2.appendChild(all); (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; jPortalFilter2.appendChild(o); });
-    jTagBar.innerHTML=''; Array.from(new Set(state.journal.flatMap(e=>e.tags||[]))).sort((a,b)=>a.localeCompare(b)).forEach(t=>{ const chip=document.createElement('span'); chip.className='tag'; chip.textContent=t; chip.dataset.tag=t; if(activeTagFilters.has(t)) chip.classList.add('active'); chip.onclick=()=>{ if(activeTagFilters.has(t)) activeTagFilters.delete(t); else activeTagFilters.add(t); renderJournal(); }; jTagBar.appendChild(chip); });
+    jPortalFilter2.innerHTML=''; 
+    const all=document.createElement('option'); 
+    all.value=''; 
+    all.textContent='All portals'; 
+    jPortalFilter2.appendChild(all); 
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      jPortalFilter2.appendChild(o); 
+    });
+    jTagBar.innerHTML=''; 
+    Array.from(new Set(state.journal.flatMap(e=>e.tags||[]))).sort((a,b)=>a.localeCompare(b)).forEach(t=>{ 
+      const chip=document.createElement('span'); 
+      chip.className='tag'; 
+      chip.textContent=t; 
+      chip.dataset.tag=t; 
+      if(activeTagFilters.has(t)) chip.classList.add('active'); 
+      chip.onclick=()=>{ 
+        if(activeTagFilters.has(t)) 
+          activeTagFilters.delete(t); 
+        else 
+          activeTagFilters.add(t); 
+        renderJournal(); 
+      }; 
+      jTagBar.appendChild(chip); 
+    });
 
     let items=[...state.journal];
-    const q=(jSearch.value||'').toLowerCase().trim(); if(q){ items=items.filter(en=> (en.title||'').toLowerCase().includes(q) || (en.text||'').toLowerCase().includes(q)); }
-    const pf=jPortalFilter2.value||''; if(pf!=='' ){ const i=parseInt(pf,10); items=items.filter(en=> (en.portalIndex??-1)===i); }
-    if(activeTagFilters.size){ items=items.filter(en=>{ const set=new Set(en.tags||[]); for(const t of activeTagFilters){ if(!set.has(t)) return false; } return true; }); }
-    const sort=jSort.value||'date_desc'; items.sort((a,b)=>{ if(sort==='date_asc') return new Date(a.date)-new Date(b.date); if(sort==='title_asc') return (a.title||'').localeCompare(b.title||''); if(sort==='title_desc') return (b.title||'').localeCompare(a.title||''); return new Date(b.date)-new Date(a.date); });
+    const q=(jSearch.value||'').toLowerCase().trim(); 
+    if(q){ 
+      items=items.filter(en=> 
+        (en.title||'').toLowerCase().includes(q) || 
+        (en.text||'').toLowerCase().includes(q)
+      ); 
+    }
+    const pf=jPortalFilter2.value||''; 
+    if(pf!=='' ){ 
+      const i=parseInt(pf,10); 
+      items=items.filter(en=> (en.portalIndex??-1)===i); 
+    }
+    if(activeTagFilters.size){ 
+      items=items.filter(en=>{ 
+        const set=new Set(en.tags||[]); 
+        for(const t of activeTagFilters){ 
+          if(!set.has(t)) return false; 
+        } 
+        return true; 
+      }); 
+    }
+    const sort=jSort.value||'date_desc'; 
+    items.sort((a,b)=>{ 
+      if(sort==='date_asc') return new Date(a.date)-new Date(b.date); 
+      if(sort==='title_asc') return (a.title||'').localeCompare(b.title||''); 
+      if(sort==='title_desc') return (b.title||'').localeCompare(a.title||''); 
+      return new Date(b.date)-new Date(a.date); 
+    });
 
-    const list=qs('#journalList'); list.innerHTML='';
-    if(!items.length){ qs('#journalEmpty').style.display='grid'; return; } else { qs('#journalEmpty').style.display='none'; }
+    const list=qs('#journalList'); 
+    list.innerHTML='';
+    if(!items.length){ 
+      qs('#journalEmpty').style.display='grid'; 
+      return; 
+    } else { 
+      qs('#journalEmpty').style.display='none'; 
+    }
     items.forEach(en=>{
-      const div=document.createElement('div'); div.className='entry';
-      const portalName = (en.portalIndex!=null && state.portals[en.portalIndex]) ? (state.portals[en.portalIndex].name||`Portal ${en.portalIndex+1}`) : '—';
+      const div=document.createElement('div'); 
+      div.className='entry';
+      const portalName = (en.portalIndex!=null && state.portals[en.portalIndex]) ? 
+        (state.portals[en.portalIndex].name||`Portal ${en.portalIndex+1}`) : '—';
       div.innerHTML = `<div class="meta"><strong>${(en.title||'(untitled)').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</strong> • ${new Date(en.date).toLocaleString()} • <span>Portal: ${(portalName||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</span></div><div class="content" style="margin:8px 0">${en.html||''}</div><div class="tags">${(en.tags||[]).map(t=>`<span class=\"tag\" data-tag=\"${t}\">${t}</span>`).join(' ')}</div><div class="actions" style="margin-top:10px"><button class="btn small" data-j-edit="${en.id}">Edit</button><button class="btn small" data-j-del="${en.id}">Delete</button></div>`;
       list.appendChild(div);
     });
   }
 
   // ===== Portal Editor Logic =====
-  let peIndex=null; // current portal index
+  let peIndex=null;
   const peDrawer=qs('#portalDrawer');
   const peName=qs('#peName');
   const peCoverPrev=qs('#peCoverPrev');
@@ -754,8 +1560,10 @@
   function ensurePortalShape(p){
     if(!p.sections) p.sections={};
     if(!p.order) p.order=[...defaultSections];
-    // initialize any missing default sections
-    defaultSections.forEach(s=>{ if(!(s in p.sections)) p.sections[s]=''; if(!p.order.includes(s)) p.order.push(s); });
+    defaultSections.forEach(s=>{ 
+      if(!(s in p.sections)) p.sections[s]=''; 
+      if(!p.order.includes(s)) p.order.push(s); 
+    });
     return p;
   }
 
@@ -763,17 +1571,29 @@
     peIndex=idx;
     const p = ensurePortalShape(state.portals[idx]);
     peName.value = p.name||'';
-    if(p.cover){ peCoverPrev.dataset.src=p.cover; peCoverPrev.style.backgroundImage=`url(${p.cover})`; peCoverPrev.textContent=''; }
-    else { peCoverPrev.dataset.src=''; peCoverPrev.style.backgroundImage=''; peCoverPrev.textContent='IMG'; }
+    if(p.cover){ 
+      peCoverPrev.dataset.src=p.cover; 
+      peCoverPrev.style.backgroundImage=`url(${p.cover})`; 
+      peCoverPrev.textContent=''; 
+    }
+    else { 
+      peCoverPrev.dataset.src=''; 
+      peCoverPrev.style.backgroundImage=''; 
+      peCoverPrev.textContent='IMG'; 
+    }
 
-    // render section list
     renderSectionList(p);
-    // render editors
     renderSectionEditors(p);
 
-    peDrawer.classList.add('open'); peDrawer.setAttribute('aria-hidden','false');
+    peDrawer.classList.add('open'); 
+    peDrawer.setAttribute('aria-hidden','false');
   }
-  function closePortalEditor(){ peDrawer.classList.remove('open'); peDrawer.setAttribute('aria-hidden','true'); peIndex=null; }
+  
+  function closePortalEditor(){ 
+    peDrawer.classList.remove('open'); 
+    peDrawer.setAttribute('aria-hidden','true'); 
+    peIndex=null; 
+  }
 
   function renderSectionList(p){
     peSecList.innerHTML='';
@@ -783,13 +1603,13 @@
       li.querySelector('button').onclick=()=>{
         const target=peEditors.querySelector(`[data-editor="${CSS.escape(name)}"]`);
         if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
-        // highlight active
         peSecList.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
         li.querySelector('button').classList.add('active');
       };
       peSecList.appendChild(li);
     });
   }
+  
   function renderSectionEditors(p){
     peEditors.innerHTML='';
     p.order.forEach((name)=>{
@@ -815,49 +1635,113 @@
     });
   }
 
-  // events for drawer controls
-  qs('#peClose').onclick=closePortalEditor; qs('#peCancel').onclick=closePortalEditor;
-  peCoverInput.onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ peCoverPrev.dataset.src=r.result; peCoverPrev.style.backgroundImage=`url(${r.result})`; peCoverPrev.textContent=''; }; r.readAsDataURL(f); };
-  qs('#peAddSec').onclick=()=>{ const name=(peNewSec.value||'').trim(); if(!name) return; const p=state.portals[peIndex]; if(!p.order.includes(name)){ p.order.push(name); p.sections[name]=''; renderSectionList(p); renderSectionEditors(p); peNewSec.value=''; } };
+  // Portal editor events
+  qs('#peClose').onclick=closePortalEditor; 
+  qs('#peCancel').onclick=closePortalEditor;
+  peCoverInput.onchange=(e)=>{ 
+    const f=e.target.files[0]; 
+    if(!f) return; 
+    const r=new FileReader(); 
+    r.onload=()=>{ 
+      peCoverPrev.dataset.src=r.result; 
+      peCoverPrev.style.backgroundImage=`url(${r.result})`; 
+      peCoverPrev.textContent=''; 
+    }; 
+    r.readAsDataURL(f); 
+  };
+  
+  qs('#peAddSec').onclick=()=>{ 
+    const name=(peNewSec.value||'').trim(); 
+    if(!name) return; 
+    const p=state.portals[peIndex]; 
+    if(!p.order.includes(name)){ 
+      p.order.push(name); 
+      p.sections[name]=''; 
+      renderSectionList(p); 
+      renderSectionEditors(p); 
+      peNewSec.value=''; 
+    } 
+  };
 
   // RTE image insert for portal sections
   document.addEventListener('change',(e)=>{
     const up=e.target.closest('input[type=file][data-img^="sec-"]');
-    if(up){ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ const name=up.getAttribute('data-img').slice(4); const area=peEditors.querySelector(`[data-area="${CSS.escape(name)}"]`); if(area){ const img=document.createElement('img'); img.src=r.result; img.alt=''; img.style.maxWidth='100%'; img.style.borderRadius='10px'; img.style.border='1px solid var(--border)'; const sel=window.getSelection(); if(sel && sel.rangeCount){ const range=sel.getRangeAt(0); range.collapse(false); range.insertNode(img); } else { area.appendChild(img); } } up.value=''; }; r.readAsDataURL(f); }
+    if(up){ 
+      const f=e.target.files[0]; 
+      if(!f) return; 
+      const r=new FileReader(); 
+      r.onload=()=>{ 
+        const name=up.getAttribute('data-img').slice(4); 
+        const area=peEditors.querySelector(`[data-area="${CSS.escape(name)}"]`); 
+        if(area){ 
+          const img=document.createElement('img'); 
+          img.src=r.result; 
+          img.alt=''; 
+          img.style.maxWidth='100%'; 
+          img.style.borderRadius='10px'; 
+          img.style.border='1px solid var(--border)'; 
+          const sel=window.getSelection(); 
+          if(sel && sel.rangeCount){ 
+            const range=sel.getRangeAt(0); 
+            range.collapse(false); 
+            range.insertNode(img); 
+          } else { 
+            area.appendChild(img); 
+          } 
+        } 
+        up.value=''; 
+      }; 
+      r.readAsDataURL(f); 
+    }
   });
 
   qs('#peSave').onclick=()=>{
-    const p=state.portals[peIndex]; if(!p) return;
+    const p=state.portals[peIndex]; 
+    if(!p) return;
     p.name = (peName.value||'').trim()||'Untitled Portal';
     p.cover = peCoverPrev.dataset.src||p.cover||'';
     p.sections = p.sections||{};
     p.order = p.order||[];
-    // collect editors
-    peEditors.querySelectorAll('[data-area]').forEach(area=>{ const key=area.getAttribute('data-area'); p.sections[key]=area.innerHTML; });
-    save(); renderPortals(); closePortalEditor();
+    peEditors.querySelectorAll('[data-area]').forEach(area=>{ 
+      const key=area.getAttribute('data-area'); 
+      p.sections[key]=area.innerHTML; 
+    });
+    save(); 
+    renderPortals(); 
+    closePortalEditor();
   };
 
   // ===== Visualizers =====
-  const vizContainer=qs('#vizContainer'); const vizEmpty=qs('#vizEmpty'); const vizSearch=qs('#vizSearch'); const vizPortalFilter=qs('#vizPortalFilter'); const vizTagBar=qs('#vizTagBar');
-  const vizUploadModal=qs('#vizUploadModal'); const vizUploadBtn=qs('#vizUploadBtn'); const vizFiles=qs('#vizFiles'); const vizName=qs('#vizName'); const vizPortalSel=qs('#vizPortalSel'); const vizTagsInput=qs('#vizTagsInput');
-  const lightbox=qs('#lightbox'); const lbImg=qs('#lbImg'); const lbMeta=qs('#lbMeta'); const lbDelete=qs('#lbDelete');
+  const vizContainer=qs('#vizContainer'); 
+  const vizEmpty=qs('#vizEmpty'); 
+  const vizSearch=qs('#vizSearch'); 
+  const vizPortalFilter=qs('#vizPortalFilter'); 
+  const vizTagBar=qs('#vizTagBar');
+  const vizUploadModal=qs('#vizUploadModal'); 
+  const vizUploadBtn=qs('#vizUploadBtn'); 
+  const vizFiles=qs('#vizFiles'); 
+  const vizName=qs('#vizName'); 
+  const vizPortalSel=qs('#vizPortalSel'); 
+  const vizTagsInput=qs('#vizTagsInput');
+  const lightbox=qs('#lightbox'); 
+  const lbImg=qs('#lbImg'); 
+  const lbMeta=qs('#lbMeta'); 
+  const lbDelete=qs('#lbDelete');
   qs('#lbClose')?.addEventListener('click',()=> lightbox.classList.remove('open'));
 
   let vizActiveTags=new Set();
-  let currentLightboxImageId=null; // Track which image is currently being viewed
+  let currentLightboxImageId=null;
 
   function openLightbox(src, meta, imageId){ 
     lbImg.src=src; 
     lbMeta.textContent=meta||''; 
-    currentLightboxImageId=imageId; // Store the image ID for deletion
-    // Show/hide delete button based on whether this is a deletable image
+    currentLightboxImageId=imageId;
     if(lbDelete) {
       lbDelete.style.display = imageId ? 'inline-flex' : 'none';
     }
     lightbox.classList.add('open'); 
   }
 
-  // Delete image functionality
   qs('#lbDelete')?.addEventListener('click', async ()=>{
     if(!currentLightboxImageId) return;
     
@@ -867,7 +1751,7 @@
         state.images.splice(imageIndex, 1);
         save();
         lightbox.classList.remove('open');
-        renderVisualizers(); // Refresh the visualizers view
+        renderVisualizers();
       }
     }
   });
@@ -877,7 +1761,23 @@
     (state.portals||[]).forEach((p,pi)=>{
       if(!p || !p.sections) return;
       Object.values(p.sections).forEach(html=>{
-        if(!html) return; const div=document.createElement('div'); div.innerHTML=html; div.querySelectorAll('img').forEach((img,idx)=>{ const src=img.getAttribute('src'); if(src){ derived.push({ id:`drv_${pi}_${idx}_${Math.random().toString(36).slice(2)}`, src, name:`Embedded ${idx+1}`, portalIndex:pi, tags:['embedded'], created:0, derived:true }); } });
+        if(!html) return; 
+        const div=document.createElement('div'); 
+        div.innerHTML=html; 
+        div.querySelectorAll('img').forEach((img,idx)=>{ 
+          const src=img.getAttribute('src'); 
+          if(src){ 
+            derived.push({ 
+              id:`drv_${pi}_${idx}_${Math.random().toString(36).slice(2)}`, 
+              src, 
+              name:`Embedded ${idx+1}`, 
+              portalIndex:pi, 
+              tags:['embedded'], 
+              created:0, 
+              derived:true 
+            }); 
+          } 
+        });
       });
     });
     return derived;
@@ -885,16 +1785,44 @@
 
   function renderVisualizers(){
     if(!vizContainer) return;
-    vizPortalFilter.innerHTML=''; const all=document.createElement('option'); all.value=''; all.textContent='All portals'; vizPortalFilter.appendChild(all); (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; vizPortalFilter.appendChild(o); });
+    vizPortalFilter.innerHTML=''; 
+    const all=document.createElement('option'); 
+    all.value=''; 
+    all.textContent='All portals'; 
+    vizPortalFilter.appendChild(all); 
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      vizPortalFilter.appendChild(o); 
+    });
 
-    vizTagBar.innerHTML=''; const allTags = Array.from(new Set((state.images||[]).flatMap(i=>i.tags||[]))).sort((a,b)=> a.localeCompare(b));
-    allTags.forEach(t=>{ const chip=document.createElement('span'); chip.className='tag'; chip.textContent=t; chip.dataset.tag=t; if(vizActiveTags.has(t)) chip.classList.add('active'); chip.onclick=()=>{ vizActiveTags.has(t)? vizActiveTags.delete(t): vizActiveTags.add(t); renderVisualizers(); }; vizTagBar.appendChild(chip); });
+    vizTagBar.innerHTML=''; 
+    const allTags = Array.from(new Set((state.images||[]).flatMap(i=>i.tags||[]))).sort((a,b)=> a.localeCompare(b));
+    allTags.forEach(t=>{ 
+      const chip=document.createElement('span'); 
+      chip.className='tag'; 
+      chip.textContent=t; 
+      chip.dataset.tag=t; 
+      if(vizActiveTags.has(t)) chip.classList.add('active'); 
+      chip.onclick=()=>{ 
+        vizActiveTags.has(t)? vizActiveTags.delete(t): vizActiveTags.add(t); 
+        renderVisualizers(); 
+      }; 
+      vizTagBar.appendChild(chip); 
+    });
 
     const derived = scanPortalImages();
-    const q=(vizSearch?.value||'').toLowerCase().trim(); const pf=vizPortalFilter?.value||''; const pfIdx = pf===''? null : parseInt(pf,10);
+    const q=(vizSearch?.value||'').toLowerCase().trim(); 
+    const pf=vizPortalFilter?.value||''; 
+    const pfIdx = pf===''? null : parseInt(pf,10);
 
     const byPortal=new Map();
-    function addToGroup(rec){ const key = rec.portalIndex!=null? rec.portalIndex : -1; if(!byPortal.has(key)) byPortal.set(key, []); byPortal.get(key).push(rec); }
+    function addToGroup(rec){ 
+      const key = rec.portalIndex!=null? rec.portalIndex : -1; 
+      if(!byPortal.has(key)) byPortal.set(key, []); 
+      byPortal.get(key).push(rec); 
+    }
 
     (state.images||[]).forEach(img=> addToGroup(img));
     derived.forEach(img=> addToGroup(img));
@@ -902,51 +1830,494 @@
     for(const [k,arr] of byPortal.entries()){
       byPortal.set(k, arr.filter(rec=>{
         if(pfIdx!==null && (rec.portalIndex??-1)!==pfIdx) return false;
-        if(vizActiveTags.size){ const set=new Set(rec.tags||[]); for(const t of vizActiveTags){ if(!set.has(t)) return false; } }
-        if(q){ const hay=[rec.name||'', ...(rec.tags||[])].join(' ').toLowerCase(); if(!hay.includes(q)) return false; }
+        if(vizActiveTags.size){ 
+          const set=new Set(rec.tags||[]); 
+          for(const t of vizActiveTags){ 
+            if(!set.has(t)) return false; 
+          } 
+        }
+        if(q){ 
+          const hay=[rec.name||'', ...(rec.tags||[])].join(' ').toLowerCase(); 
+          if(!hay.includes(q)) return false; 
+        }
         return true;
       }));
     }
 
-    vizContainer.innerHTML=''; let total=0;
+    vizContainer.innerHTML=''; 
+    let total=0;
     const keys=[...byPortal.keys()].sort((a,b)=> a-b);
     keys.forEach(key=>{
-      const items=byPortal.get(key)||[]; if(!items.length) return; total+=items.length;
-      const grp=document.createElement('div'); grp.className='viz-group';
+      const items=byPortal.get(key)||[]; 
+      if(!items.length) return; 
+      total+=items.length;
+      const grp=document.createElement('div'); 
+      grp.className='viz-group';
       const title = key===-1? 'Unassigned' : (state.portals[key]?.name || `Portal ${key+1}`);
       grp.innerHTML = `<h3>${title} • ${items.length}</h3>`;
-      const grid=document.createElement('div'); grid.className='viz-grid';
+      const grid=document.createElement('div'); 
+      grid.className='viz-grid';
       items.forEach(it=>{
-        const th=document.createElement('div'); th.className='viz-thumb'; th.style.backgroundImage=`url(${it.src})`;
-        const cap=document.createElement('div'); cap.className='cap'; cap.textContent=it.name || (it.derived? 'Embedded' : 'Image'); th.appendChild(cap);
-        // Pass the image ID for uploaded images, null for derived/embedded images (which can't be deleted)
+        const th=document.createElement('div'); 
+        th.className='viz-thumb'; 
+        th.style.backgroundImage=`url(${it.src})`;
+        const cap=document.createElement('div'); 
+        cap.className='cap'; 
+        cap.textContent=it.name || (it.derived? 'Embedded' : 'Image'); 
+        th.appendChild(cap);
         th.onclick=()=> openLightbox(it.src, `${title}${it.tags?.length? ' • '+it.tags.join(', '):''}`, it.derived ? null : it.id);
         grid.appendChild(th);
       });
-      grp.appendChild(grid); vizContainer.appendChild(grp);
+      grp.appendChild(grid); 
+      vizContainer.appendChild(grp);
     });
 
     vizEmpty.style.display = total? 'none' : 'grid';
   }
 
   vizUploadBtn?.addEventListener('click', ()=>{
-    vizPortalSel.innerHTML=''; const none=document.createElement('option'); none.value='-1'; none.textContent='Unassigned'; vizPortalSel.appendChild(none); (state.portals||[]).forEach((p,i)=>{ const o=document.createElement('option'); o.value=String(i); o.textContent=p.name||`Portal ${i+1}`; vizPortalSel.appendChild(o); });
-    if(vizFiles) vizFiles.value=''; if(vizName) vizName.value=''; if(vizTagsInput) vizTagsInput.value=''; vizUploadModal.classList.add('open');
+    vizPortalSel.innerHTML=''; 
+    const none=document.createElement('option'); 
+    none.value='-1'; 
+    none.textContent='Unassigned'; 
+    vizPortalSel.appendChild(none); 
+    (state.portals||[]).forEach((p,i)=>{ 
+      const o=document.createElement('option'); 
+      o.value=String(i); 
+      o.textContent=p.name||`Portal ${i+1}`; 
+      vizPortalSel.appendChild(o); 
+    });
+    if(vizFiles) vizFiles.value=''; 
+    if(vizName) vizName.value=''; 
+    if(vizTagsInput) vizTagsInput.value=''; 
+    vizUploadModal.classList.add('open');
   });
+  
   qs('#vizCancel')?.addEventListener('click', ()=> vizUploadModal.classList.remove('open'));
   qs('#vizSave')?.addEventListener('click', ()=>{
-    const files = Array.from(vizFiles.files||[]); if(!files.length){ vizUploadModal.classList.remove('open'); return; }
-    const prefix=(vizName.value||'').trim(); const tags=(vizTagsInput.value||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const files = Array.from(vizFiles.files||[]); 
+    if(!files.length){ 
+      vizUploadModal.classList.remove('open'); 
+      return; 
+    }
+    const prefix=(vizName.value||'').trim(); 
+    const tags=(vizTagsInput.value||'').split(',').map(s=>s.trim()).filter(Boolean);
     const portalIndex=parseInt(vizPortalSel.value||'-1',10);
-    let pending=files.length; if(!state.images) state.images=[];
-    files.forEach((f,idx)=>{ const r=new FileReader(); r.onload=()=>{ state.images.push({ id:uid(), src:r.result, name: prefix? `${prefix}${idx+1}` : (f.name||`image_${idx+1}`), tags:[...tags], portalIndex: isNaN(portalIndex)? -1 : portalIndex, created: Date.now() }); if(--pending===0){ save(); vizUploadModal.classList.remove('open'); renderVisualizers(); } }; r.readAsDataURL(f); });
+    let pending=files.length; 
+    if(!state.images) state.images=[];
+    files.forEach((f,idx)=>{ 
+      const r=new FileReader(); 
+      r.onload=()=>{ 
+        state.images.push({ 
+          id:uid(), 
+          src:r.result, 
+          name: prefix? `${prefix}${idx+1}` : (f.name||`image_${idx+1}`), 
+          tags:[...tags], 
+          portalIndex: isNaN(portalIndex)? -1 : portalIndex, 
+          created: Date.now() 
+        }); 
+        if(--pending===0){ 
+          save(); 
+          vizUploadModal.classList.remove('open'); 
+          renderVisualizers(); 
+        } 
+      }; 
+      r.readAsDataURL(f); 
+    });
   });
 
   vizSearch?.addEventListener('input', ()=> renderVisualizers());
   vizPortalFilter?.addEventListener('change', ()=> renderVisualizers());
 
-// ===== Dropbox Sync (Direct API) =====
-  // Use direct Dropbox API calls instead of SDK to avoid loading issues
+  // ===== Lucid Dreaming System =====
+  let currentDreamEntry = null;
+  let currentGoal = null;
+  let currentTechnique = null;
+  let activeLucidTab = 'dreams';
+
+  function renderLucidDreaming() {
+    initLucidTabs();
+    renderActiveTab();
+  }
+
+  function initLucidTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeLucidTab = btn.dataset.tab;
+        renderActiveTab();
+      };
+    });
+  }
+
+  function renderActiveTab() {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.hidden = true);
+    const activeTab = qs(`#${activeLucidTab}-tab`);
+    if(activeTab) activeTab.hidden = false;
+    
+    if(activeLucidTab === 'dreams') renderDreams();
+    if(activeLucidTab === 'goals') renderGoals();
+    if(activeLucidTab === 'techniques') renderTechniques();
+    if(activeLucidTab === 'progress') renderProgress();
+  }
+
+  function renderDreams() {
+    const list = qs('#dreamList');
+    const empty = qs('#dreamEmpty');
+    
+    if(!list || !empty) return;
+    
+    if(!state.dreams || state.dreams.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    const sortedDreams = [...state.dreams].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    list.innerHTML = '';
+    sortedDreams.forEach(dream => {
+      const div = document.createElement('div');
+      div.className = 'dream-entry';
+      
+      const date = new Date(dream.date);
+      const dateStr = date.toLocaleDateString();
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      const lucidityBadge = dream.lucidity === 'lucid' ? 'lucid' : 
+                           dream.lucidity === 'semi' ? 'semi' : 'normal';
+      
+      div.innerHTML = `
+        <div class="dream-header">
+          <div class="dream-meta">
+            <div class="dream-date" style="font-weight:600">${dream.title || 'Untitled Dream'}</div>
+            <div style="font-size:12px; color:var(--muted)">${dateStr} ${timeStr}</div>
+            <div class="dream-badges">
+              <span class="dream-badge ${lucidityBadge}">${dream.lucidity === 'lucid' ? 'Lucid' : dream.lucidity === 'semi' ? 'Semi-Lucid' : 'Normal'}</span>
+              <span class="dream-badge" style="background:rgba(124,108,255,.1); color:var(--accent)">Vividness: ${dream.vividness}/10</span>
+              ${dream.emotions?.map(e => `<span class="dream-badge" style="background:rgba(139,92,246,.1)">${e}</span>`).join('') || ''}
+            </div>
+          </div>
+          <div class="journal-actions">
+            <button class="btn small" onclick="editDream('${dream.id}')">Edit</button>
+            <button class="btn small" onclick="deleteDream('${dream.id}')">Delete</button>
+          </div>
+        </div>
+        <div class="dream-content">${dream.description || 'No description'}</div>
+        ${dream.tags?.length ? `<div style="margin-top:8px">${dream.tags.map(tag => `<span class="journal-tag">${tag}</span>`).join(' ')}</div>` : ''}
+      `;
+      
+      list.appendChild(div);
+    });
+  }
+
+  // Global functions for dream actions
+  window.editDream = (id) => {
+    const dream = state.dreams.find(d => d.id === id);
+    if(dream) openDreamEditor(dream);
+  };
+
+  window.deleteDream = async (id) => {
+    if(await askConfirm('Delete this dream entry?')) {
+      state.dreams = state.dreams.filter(d => d.id !== id);
+      save();
+      renderDreams();
+    }
+  };
+
+  function renderGoals() {
+    const activeList = qs('#activeGoals');
+    const completedList = qs('#completedGoals');
+    
+    if(!activeList || !completedList) return;
+    
+    activeList.innerHTML = '';
+    completedList.innerHTML = '';
+    
+    (state.lucidGoals || []).forEach(goal => {
+      const div = document.createElement('div');
+      div.className = `goal-item ${goal.completed ? 'completed' : ''}`;
+      
+      div.innerHTML = `
+        <div>
+          <div style="font-weight:600">${goal.title}</div>
+          <div style="font-size:12px; color:var(--muted)">${goal.category} • ${goal.difficulty}</div>
+        </div>
+        <div class="goal-actions">
+          ${!goal.completed ? `<button class="btn small" onclick="completeGoal('${goal.id}')">✓ Complete</button>` : ''}
+          <button class="btn small" onclick="editGoal('${goal.id}')">Edit</button>
+          <button class="btn small" onclick="deleteGoal('${goal.id}')">Delete</button>
+        </div>
+      `;
+      
+      if(goal.completed) {
+        completedList.appendChild(div);
+      } else {
+        activeList.appendChild(div);
+      }
+    });
+    
+    if(!activeList.children.length) {
+      activeList.innerHTML = '<div class="empty" style="padding:20px; text-align:center; color:var(--muted)">No active goals yet</div>';
+    }
+    if(!completedList.children.length) {
+      completedList.innerHTML = '<div class="empty" style="padding:20px; text-align:center; color:var(--muted)">No completed goals yet</div>';
+    }
+  }
+
+  // Global goal functions
+  window.completeGoal = (id) => {
+    const goal = state.lucidGoals.find(g => g.id === id);
+    if(goal) {
+      goal.completed = true;
+      goal.completedDate = new Date().toISOString();
+      save();
+      renderGoals();
+    }
+  };
+
+  window.editGoal = (id) => {
+    const goal = state.lucidGoals.find(g => g.id === id);
+    if(goal) openGoalEditor(goal);
+  };
+
+  window.deleteGoal = async (id) => {
+    if(await askConfirm('Delete this goal?')) {
+      state.lucidGoals = state.lucidGoals.filter(g => g.id !== id);
+      save();
+      renderGoals();
+    }
+  };
+
+  function renderTechniques() {
+    const list = qs('#techniquesList');
+    if(!list) return;
+    
+    list.innerHTML = '';
+    
+    (state.techniques || []).forEach(technique => {
+      const card = document.createElement('div');
+      card.className = 'technique-card';
+      
+      const stars = Array.from({length: 5}, (_, i) => 
+        `<span class="star ${i < technique.rating ? 'filled' : ''}" style="pointer-events:none">★</span>`
+      ).join('');
+      
+      card.innerHTML = `
+        <h4>${technique.name}</h4>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:8px">${technique.type}</div>
+        <div class="technique-rating">${stars}</div>
+        <div style="margin:8px 0">${technique.description}</div>
+        ${technique.notes ? `<div style="font-size:12px; color:var(--muted); border-top:1px solid var(--border); padding-top:8px; margin-top:8px">${technique.notes}</div>` : ''}
+        <div style="display:flex; gap:6px; margin-top:12px">
+          <button class="btn small" onclick="editTechnique('${technique.id}')">Edit</button>
+          <button class="btn small" onclick="deleteTechnique('${technique.id}')">Delete</button>
+        </div>
+      `;
+      
+      list.appendChild(card);
+    });
+    
+    if(!list.children.length) {
+      list.innerHTML = '<div class="empty">No techniques added yet</div>';
+    }
+  }
+
+  // Global technique functions  
+  window.editTechnique = (id) => {
+    const technique = state.techniques.find(t => t.id === id);
+    if(technique) openTechniqueEditor(technique);
+  };
+
+  window.deleteTechnique = async (id) => {
+    if(await askConfirm('Delete this technique?')) {
+      state.techniques = state.techniques.filter(t => t.id !== id);
+      save();
+      renderTechniques();
+    }
+  };
+
+  function renderProgress() {
+    const dreams = state.dreams || [];
+    
+    const recallRate = Math.min(dreams.length * 10, 100);
+    const lucidDreams = dreams.filter(d => d.lucidity === 'lucid' || d.lucidity === 'semi');
+    const lucidityRate = dreams.length ? Math.round((lucidDreams.length / dreams.length) * 100) : 0;
+    const completedGoals = (state.lucidGoals || []).filter(g => g.completed).length;
+    
+    const recallEl = qs('#recallRate');
+    const lucidityEl = qs('#lucidityRate');
+    const goalsEl = qs('#goalsAchieved');
+    const freqEl = qs('#dreamFreq');
+    
+    if(recallEl) recallEl.textContent = `${recallRate}%`;
+    if(lucidityEl) lucidityEl.textContent = `${lucidityRate}%`;
+    if(goalsEl) goalsEl.textContent = completedGoals.toString();
+    if(freqEl) freqEl.textContent = (dreams.length / 4.3).toFixed(1);
+  }
+
+  // Dream modal handlers
+  qs('#newDream')?.addEventListener('click', () => openDreamEditor());
+  qs('#newGoal')?.addEventListener('click', () => openGoalEditor());
+  qs('#newTechnique')?.addEventListener('click', () => openTechniqueEditor());
+
+  function openDreamEditor(dream = null) {
+    currentDreamEntry = dream;
+    const modal = qs('#dreamModal');
+    
+    qs('#dreamTitle').value = dream?.title || '';
+    qs('#dreamDate').value = dream?.date ? toLocalInput(dream.date) : toLocalInput(new Date().toISOString());
+    qs('#dreamLucidity').value = dream?.lucidity || 'normal';
+    qs('#dreamVividness').value = dream?.vividness || 5;
+    qs('#vividnessValue').textContent = dream?.vividness || 5;
+    qs('#dreamDescription').innerHTML = dream?.description || '';
+    qs('#dreamTagsInput').value = (dream?.tags || []).join(', ');
+    
+    // Clear emotion/RC buttons
+    document.querySelectorAll('.emotion-btn, .rc-btn').forEach(btn => btn.classList.remove('active'));
+    
+    modal.classList.add('open');
+  }
+
+  function openGoalEditor(goal = null) {
+    currentGoal = goal;
+    const modal = qs('#goalModal');
+    
+    qs('#goalTitle').value = goal?.title || '';
+    qs('#goalCategory').value = goal?.category || 'exploration';
+    qs('#goalDescription').value = goal?.description || '';
+    qs('#goalDifficulty').value = goal?.difficulty || 'medium';
+    
+    modal.classList.add('open');
+  }
+
+  function openTechniqueEditor(technique = null) {
+    currentTechnique = technique;
+    const modal = qs('#techniqueModal');
+    
+    qs('#techniqueName').value = technique?.name || '';
+    qs('#techniqueType').value = technique?.type || 'induction';
+    qs('#techniqueDescription').value = technique?.description || '';
+    qs('#techniqueNotes').value = technique?.notes || '';
+    
+    // Set star rating
+    const stars = modal.querySelectorAll('.star');
+    stars.forEach((star, i) => {
+      star.classList.toggle('filled', i < (technique?.rating || 0));
+    });
+    
+    modal.classList.add('open');
+  }
+
+  // Modal save handlers
+  qs('#dreamSave')?.addEventListener('click', () => {
+    const dreamData = {
+      id: currentDreamEntry?.id || uid(),
+      title: qs('#dreamTitle').value.trim(),
+      date: new Date(qs('#dreamDate').value).toISOString(),
+      lucidity: qs('#dreamLucidity').value,
+      vividness: parseInt(qs('#dreamVividness').value),
+      description: qs('#dreamDescription').innerHTML,
+      tags: qs('#dreamTagsInput').value.split(',').map(t => t.trim()).filter(Boolean),
+      emotions: Array.from(document.querySelectorAll('.emotion-btn.active')).map(btn => btn.dataset.emotion),
+      realityChecks: Array.from(document.querySelectorAll('.rc-btn.active')).map(btn => btn.dataset.rc),
+      created: currentDreamEntry?.created || Date.now()
+    };
+    
+    if(currentDreamEntry) {
+      const idx = state.dreams.findIndex(d => d.id === currentDreamEntry.id);
+      if(idx > -1) state.dreams[idx] = dreamData;
+    } else {
+      if(!state.dreams) state.dreams = [];
+      state.dreams.push(dreamData);
+    }
+    
+    save();
+    qs('#dreamModal').classList.remove('open');
+    renderDreams();
+  });
+
+  qs('#goalSave')?.addEventListener('click', () => {
+    const goalData = {
+      id: currentGoal?.id || uid(),
+      title: qs('#goalTitle').value.trim(),
+      category: qs('#goalCategory').value,
+      description: qs('#goalDescription').value.trim(),
+      difficulty: qs('#goalDifficulty').value,
+      completed: currentGoal?.completed || false,
+      created: currentGoal?.created || Date.now()
+    };
+    
+    if(currentGoal) {
+      const idx = state.lucidGoals.findIndex(g => g.id === currentGoal.id);
+      if(idx > -1) state.lucidGoals[idx] = goalData;
+    } else {
+      if(!state.lucidGoals) state.lucidGoals = [];
+      state.lucidGoals.push(goalData);
+    }
+    
+    save();
+    qs('#goalModal').classList.remove('open');
+    renderGoals();
+  });
+
+  qs('#techniqueSave')?.addEventListener('click', () => {
+    const rating = document.querySelectorAll('#techniqueRating .star.filled').length;
+    
+    const techniqueData = {
+      id: currentTechnique?.id || uid(),
+      name: qs('#techniqueName').value.trim(),
+      type: qs('#techniqueType').value,
+      description: qs('#techniqueDescription').value.trim(),
+      notes: qs('#techniqueNotes').value.trim(),
+      rating: rating,
+      created: currentTechnique?.created || Date.now()
+    };
+    
+    if(currentTechnique) {
+      const idx = state.techniques.findIndex(t => t.id === currentTechnique.id);
+      if(idx > -1) state.techniques[idx] = techniqueData;
+    } else {
+      if(!state.techniques) state.techniques = [];
+      state.techniques.push(techniqueData);
+    }
+    
+    save();
+    qs('#techniqueModal').classList.remove('open');
+    renderTechniques();
+  });
+
+  // Modal cancel handlers
+  qs('#dreamCancel')?.addEventListener('click', () => qs('#dreamModal').classList.remove('open'));
+  qs('#goalCancel')?.addEventListener('click', () => qs('#goalModal').classList.remove('open'));
+  qs('#techniqueCancel')?.addEventListener('click', () => qs('#techniqueModal').classList.remove('open'));
+
+  // Emotion and RC button handlers
+  document.addEventListener('click', (e) => {
+    if(e.target.matches('.emotion-btn, .rc-btn')) {
+      e.target.classList.toggle('active');
+    }
+  });
+
+  // Star rating handler
+  document.addEventListener('click', (e) => {
+    if(e.target.matches('#techniqueRating .star')) {
+      const rating = parseInt(e.target.dataset.rating);
+      const stars = document.querySelectorAll('#techniqueRating .star');
+      stars.forEach((star, i) => {
+        star.classList.toggle('filled', i < rating);
+      });
+    }
+  });
+
+  // Vividness slider handler
+  qs('#dreamVividness')?.addEventListener('input', (e) => {
+    qs('#vividnessValue').textContent = e.target.value;
+  });
+
+  // ===== Dropbox Sync =====
   async function dropboxApiCall(endpoint, options = {}) {
     if(!state.sync?.accessToken) {
       throw new Error('No access token available');
@@ -970,7 +2341,6 @@
       console.error('Dropbox API Error:', response.status, errorText);
       
       if(response.status === 401) {
-        // Clear invalid token
         state.sync.accessToken = '';
         save();
         throw new Error('Access token expired or invalid');
@@ -1068,23 +2438,6 @@
     return response.blob();
   }
   
-  // Enhanced save function - auto-sync to Dropbox if connected
-  function save(){ 
-    // Always save to localStorage as backup
-    localStorage.setItem(storeKey, JSON.stringify(state)); 
-    
-    // If Dropbox is connected and auto-sync is enabled, sync in background
-    if(state.sync?.accessToken && state.sync?.auto) {
-      // Use setTimeout to avoid blocking the main save operation
-      setTimeout(() => {
-        syncPush().catch(err => {
-          console.warn('Auto-sync failed:', err);
-          // Don't show error for auto-sync failures to avoid spam
-        });
-      }, 100);
-    }
-  }
-  
   async function syncPush(){ 
     try{ 
       setSyncStatus('Pushing to Dropbox...');
@@ -1093,10 +2446,8 @@
         throw new Error('No access token - please connect Dropbox first');
       }
       
-      // Create a lightweight version for storage - convert images to references
       const lightState = JSON.parse(JSON.stringify(state));
       
-      // Keep images in localStorage but create lightweight references for Dropbox
       if(lightState.images) {
         lightState.images = lightState.images.map(img => ({
           ...img,
@@ -1110,7 +2461,7 @@
       
       await dbxUpload(path, blob); 
       state.sync.lastSync = Date.now(); 
-      localStorage.setItem(storeKey, JSON.stringify(state)); // Save updated sync time
+      localStorage.setItem(storeKey, JSON.stringify(state));
       setSyncStatus('Pushed at ' + new Date(state.sync.lastSync).toLocaleString()); 
     }catch(err){ 
       console.error('Push failed:', err); 
@@ -1132,7 +2483,6 @@
       const text = await file.text(); 
       const incoming = JSON.parse(text); 
       
-      // Restore image references to actual data URLs from localStorage if available
       if(incoming.images) {
         const localState = load();
         const localImageMap = new Map();
@@ -1158,7 +2508,6 @@
     } 
   }
 
-  // Simplified OAuth using Dropbox's implicit grant flow
   async function startOAuth(){ 
     try{ 
       const appKey=(qs('#dbxAppKey')?.value||'').trim(); 
@@ -1167,7 +2516,6 @@
         return; 
       }
       
-      // Store the app key
       state.sync.appKey = appKey;
       state.sync.provider = 'dropbox';
       save();
@@ -1193,7 +2541,6 @@
           state.sync.accessToken=token; 
           state.sync.provider='dropbox'; 
           save(); 
-          // Clean up the URL
           window.history.replaceState({}, document.title, window.location.pathname+window.location.search); 
           setSyncStatus('Connected via OAuth'); 
           return true; 
@@ -1205,8 +2552,21 @@
     return false; 
   }
 
-  // Settings wiring
-  function renderSettings(){ const s=state.sync||{}; const appKeyEl=qs('#dbxAppKey'); const tokEl=qs('#dbxAccessToken'); const pathEl=qs('#dbxPath'); const autoEl=qs('#autoSyncToggle'); const minsEl=qs('#autoSyncMins'); if(appKeyEl) appKeyEl.value=s.appKey||''; if(tokEl) tokEl.value=s.accessToken||''; if(pathEl) pathEl.value=s.path||'/Apps/DR Script Builder/data.json'; if(autoEl) autoEl.checked=!!s.auto; if(minsEl) minsEl.value=String(s.intervalMins||5); setSyncStatus(s.accessToken? 'Connected' : 'Not connected'); }
+  function renderSettings(){ 
+    const s=state.sync||{}; 
+    const appKeyEl=qs('#dbxAppKey'); 
+    const tokEl=qs('#dbxAccessToken'); 
+    const pathEl=qs('#dbxPath'); 
+    const autoEl=qs('#autoSyncToggle'); 
+    const minsEl=qs('#autoSyncMins'); 
+    if(appKeyEl) appKeyEl.value=s.appKey||''; 
+    if(tokEl) tokEl.value=s.accessToken||''; 
+    if(pathEl) pathEl.value=s.path||'/Apps/DR Script Builder/data.json'; 
+    if(autoEl) autoEl.checked=!!s.auto; 
+    if(minsEl) minsEl.value=String(s.intervalMins||5); 
+    setSyncStatus(s.accessToken? 'Connected' : 'Not connected'); 
+  }
+  
   function attachSettingsHandlers(){
     qs('#dbxConnect')?.addEventListener('click', ()=>{ 
       const appKey = (qs('#dbxAppKey')?.value||'').trim();
@@ -1224,48 +2584,66 @@
         return; 
       }
       
-      // Debug token
-      console.log('Saving token length:', t.length);
-      console.log('Token starts with:', t.substring(0, 10) + '...');
-      
       state.sync.accessToken=t; 
       state.sync.provider='dropbox'; 
       state.sync.appKey=(qs('#dbxAppKey')?.value||'').trim(); 
       state.sync.path=(qs('#dbxPath')?.value||'/Apps/DR Script Builder/data.json'); 
       save(); 
       
-      // Test the connection immediately
       testDropboxConnection();
     });
     
-    qs('#dbxDisconnect')?.addEventListener('click', ()=>{ state.sync.accessToken=''; save(); setSyncStatus('Disconnected'); });
-    qs('#dbxPath')?.addEventListener('change', e=>{ state.sync.path=e.target.value; save(); });
-    qs('#autoSyncToggle')?.addEventListener('change', e=>{ state.sync.auto=!!e.target.checked; save(); setupAutoSync(); });
-    qs('#autoSyncMins')?.addEventListener('change', e=>{ const n=parseInt(e.target.value,10); state.sync.intervalMins=isNaN(n)?5:Math.max(1,n); save(); setupAutoSync(); });
-    qs('#syncNow')?.addEventListener('click', ()=>{ if(!state.sync?.accessToken){ alert('Connect Dropbox first.'); return; } syncPush(); });
-    qs('#pullNow')?.addEventListener('click', ()=>{ if(!state.sync?.accessToken){ alert('Connect Dropbox first.'); return; } syncPull(); });
-    qs('#testConnection')?.addEventListener('click', ()=>{ testDropboxConnection(); });
+    qs('#dbxDisconnect')?.addEventListener('click', ()=>{ 
+      state.sync.accessToken=''; 
+      save(); 
+      setSyncStatus('Disconnected'); 
+    });
+    qs('#dbxPath')?.addEventListener('change', e=>{ 
+      state.sync.path=e.target.value; 
+      save(); 
+    });
+    qs('#autoSyncToggle')?.addEventListener('change', e=>{ 
+      state.sync.auto=!!e.target.checked; 
+      save(); 
+      setupAutoSync(); 
+    });
+    qs('#autoSyncMins')?.addEventListener('change', e=>{ 
+      const n=parseInt(e.target.value,10); 
+      state.sync.intervalMins=isNaN(n)?5:Math.max(1,n); 
+      save(); 
+      setupAutoSync(); 
+    });
+    qs('#syncNow')?.addEventListener('click', ()=>{ 
+      if(!state.sync?.accessToken){ 
+        alert('Connect Dropbox first.'); 
+        return; 
+      } 
+      syncPush(); 
+    });
+    qs('#pullNow')?.addEventListener('click', ()=>{ 
+      if(!state.sync?.accessToken){ 
+        alert('Connect Dropbox first.'); 
+        return; 
+      } 
+      syncPull(); 
+    });
+    qs('#testConnection')?.addEventListener('click', ()=>{ 
+      testDropboxConnection(); 
+    });
   }
   
-  // Test Dropbox connection function
   async function testDropboxConnection() {
     try {
       setSyncStatus('Testing connection...');
-      console.log('Testing Dropbox connection...');
       
       if(!state.sync?.accessToken) {
         setSyncStatus('Failed: No access token');
         return;
       }
       
-      console.log('Access token available:', !!state.sync.accessToken);
-      console.log('Access token length:', state.sync.accessToken.length);
-      
-      // Test with a simple API call
       const response = await dropboxApiCall('users/get_current_account');
       const result = await response.json();
       
-      console.log('Dropbox API test successful:', result);
       setSyncStatus(`Connected successfully as ${result.name.display_name}`);
       
     } catch(err) {
@@ -1273,23 +2651,24 @@
       setSyncStatus(`Failed: ${err.message}`);
     }
   }
-  let autoTimer=null; function setupAutoSync(){ if(autoTimer){ clearInterval(autoTimer); autoTimer=null; } if(state.sync?.auto && state.sync?.accessToken){ autoTimer=setInterval(()=>{ syncPush(); }, Math.max(1, state.sync.intervalMins||5)*60*1000); } }
+  
+  let autoTimer=null; 
+  function setupAutoSync(){ 
+    if(autoTimer){ 
+      clearInterval(autoTimer); 
+      autoTimer=null; 
+    } 
+    if(state.sync?.auto && state.sync?.accessToken){ 
+      autoTimer=setInterval(()=>{ 
+        syncPush(); 
+      }, Math.max(1, state.sync.intervalMins||5)*60*1000); 
+    } 
+  }
 
-  // ===== Boot =====
-  function renderAll(){ renderPortals(); renderJournal(); renderWR(); renderPlaylists(); if(views.settings && !views.settings.hidden){ renderSettings(); } }
-  // show portals by default; ensure all other views hidden
-  Object.keys(views).forEach(k=>{ if(views[k]) views[k].hidden = (k!=='portals'); });
-  
-  // Check for OAuth token on page load
-  tryParseImplicitToken();
-  
-  renderAll();
-  attachSettingsHandlers();
-  // Export / Import wiring
+  // Export/Import functionality
   async function doExportAll(){
     try{
       const json = JSON.stringify(state, null, 2);
-      // Prefer modern file picker when available (Chromium/Edge)
       if(window.showSaveFilePicker){
         const handle = await window.showSaveFilePicker({
           suggestedName: 'dr-script-builder-data.json',
@@ -1302,31 +2681,40 @@
         return;
       }
 
-      // Firefox-friendly path: open a data URL in a new tab (user can Save Page As…)
       const isFirefox = typeof navigator!=='undefined' && /firefox/i.test(navigator.userAgent);
       if(isFirefox){
         const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
         const win = window.open(dataUrl, '_blank');
-        if(win){ setSyncStatus('Opened JSON in a new tab (use Save Page As…)'); return; }
-        // if popup blocked, fall back to anchor
+        if(win){ 
+          setSyncStatus('Opened JSON in a new tab (use Save Page As…)'); 
+          return; 
+        }
       }
 
-      // Fallback to anchor download for other browsers
       const blob = new Blob([json], {type:'application/json;charset=utf-8'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = 'dr-script-builder-data.json'; a.rel='noopener';
+      a.href = url; 
+      a.download = 'dr-script-builder-data.json'; 
+      a.rel='noopener';
       document.body.appendChild(a);
-      // Firefox sometimes ignores .click() on detached anchors – dispatch a real click event
       a.dispatchEvent(new MouseEvent('click', {bubbles:true, cancelable:true, view:window}));
-      setTimeout(()=>{ a.remove(); URL.revokeObjectURL(url); }, 1500);
+      setTimeout(()=>{ 
+        a.remove(); 
+        URL.revokeObjectURL(url); 
+      }, 1500);
       setSyncStatus('Exported as download');
-    }catch(err){ console.error('Export failed', err); alert('Export failed: '+(err?.message||err)); }
+    }catch(err){ 
+      console.error('Export failed', err); 
+      alert('Export failed: '+(err?.message||err)); 
+    }
   }
+  
   qs('#exportAll')?.addEventListener('click', ()=>{ doExportAll(); });
   qs('#importBtn')?.addEventListener('click', ()=> qs('#importFile')?.click());
   qs('#importFile')?.addEventListener('change', (e)=>{
-    const f = e.target.files?.[0]; if(!f) return;
+    const f = e.target.files?.[0]; 
+    if(!f) return;
     const r = new FileReader();
     r.onload = ()=>{
       try{
@@ -1336,30 +2724,40 @@
         save();
         renderAll();
         setSyncStatus('Imported local file');
-      }catch(err){ console.error('Import failed', err); alert('Import failed: '+(err?.message||err)); }
+      }catch(err){ 
+        console.error('Import failed', err); 
+        alert('Import failed: '+(err?.message||err)); 
+      }
     };
     r.readAsText(f);
     e.target.value='';
   });
+
+  // ===== Boot =====
+  function renderAll(){ 
+    renderPortals(); 
+    renderJournal(); 
+    renderWR(); 
+    renderPlaylists(); 
+    renderVisualizers();
+    if(views.settings && !views.settings.hidden){ 
+      renderSettings(); 
+    } 
+    if(views.lucid && !views.lucid.hidden){ 
+      renderLucidDreaming(); 
+    } 
+  }
+  
+  Object.keys(views).forEach(k=>{ 
+    if(views[k]) views[k].hidden = (k!=='portals'); 
+  });
+  
+  tryParseImplicitToken();
+  renderAll();
+  attachSettingsHandlers();
   setupAutoSync();
 
-  // Tiny self-checks (helps catch syntax issues quickly)
-  if(typeof renderPortals!=='function' || typeof renderJournal!=='function' || typeof renderWR!=='function' || typeof renderPlaylists!=='function') {
-    console.error('Core renderers missing');
-  }
-  // Quick newline handling self-tests
-  (function(){
-    const sample = 'a\nb\nc';
-    const arr = sample.split('\n');
-    if(arr.length!==3 || arr[1]!=='b') console.error('Split on "\\n" failed');
-    const joined = arr.join('\n');
-    if(joined!==sample) console.error('Join on "\\n" failed');
-  })();
-
-  // Syntax sanity for editor wiring
-  if(typeof openPortalEditor!=='function' || typeof openEditPortal!=='function') {
-    console.error('Portal editor functions missing');
-  }
+  console.log('DR Script Builder loaded successfully');
 </script>
 </body>
 </html>
